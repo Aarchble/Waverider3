@@ -10,19 +10,12 @@ public class ExternalStream : NearStream
     Parcel _Fluid;
     bool Upper;
 
-    public ExternalStream(Vector3 inlet, Vector3 outlet, bool upper, Vector3? flowDir = null)
+    public ExternalStream(Vector3 inlet, Vector3 outlet, bool upper)
     {
         Upper = upper;
         _Inlet = new Vector3[1] { inlet };
         _Outlet = new Vector3[1] { outlet };
-        if (flowDir != null)
-        {
-            _FlowDir = Vector3.Normalize((Vector3)flowDir); // Cast nullable V3 to V3
-        }
-        else
-        {
-            _FlowDir = Vector3.Normalize(_Outlet[0] - _Inlet[0]);
-        }
+        _FlowDir = Vector3.Normalize(_Outlet[0] - _Inlet[0]);
     }
 
     public override Vector3[] WallPoints(float t)

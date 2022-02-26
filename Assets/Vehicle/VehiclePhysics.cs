@@ -60,7 +60,7 @@ public class VehiclePhysics : MonoBehaviour
         fcs = GetComponent<FlightControls>();
 
         // ! Set up dynamic params
-        float height = Mathf.Abs(shp.InternalNozzle.Outlet[^1].y) + Mathf.Abs(shp.UpperRamp.Outlet[0].y); // -- verified --
+        float height = Mathf.Abs(shp.Nozzle.Outlet[^1].y) + Mathf.Abs(shp.UpperRamp.Outlet[0].y); // -- verified --
         rb.inertia = 1f / 12f * rb.mass * (shp.Length * shp.Length + height * height);
 
         //inletMat = new(shockMat);
@@ -234,26 +234,16 @@ public class VehiclePhysics : MonoBehaviour
         StreamForceAndMoment(Vector3.Lerp(shp.Engine.Inlet[0], shp.Engine.Inlet[^1], 0.5f), shp.Engine.FlowDir, (shp.Engine.Fluid.V - preEngine.V) * massFlow);
 
 
-        // InternalNozzle -> ExternalNozzle => NOZZLE
-        float internalAreaRatio = (shp.InternalNozzle.Outlet[^1] - shp.InternalNozzle.Outlet[0]).magnitude / (shp.InternalNozzle.Inlet[^1] - shp.InternalNozzle.Inlet[0]).magnitude;
-        Nozzle InternalNozzle = new(internalAreaRatio);
-        shp.InternalNozzle.Fluid = InternalNozzle.GetParcel(shp.Engine.Fluid);
+        // InternalNozzle -> Exhaust => NOZZLE
+        float internalAreaRatio = (shp.Nozzle.Outlet[^1] - shp.Nozzle.Outlet[0]).magnitude / (shp.Nozzle.Inlet[^1] - shp.Nozzle.Inlet[0]).magnitude;
+        Nozzle Nozzle = new(internalAreaRatio);
+        shp.Nozzle.Fluid = Nozzle.GetParcel(shp.Engine.Fluid);
         // ! Pressure Forces
-        PresureForceAndMoment(shp.InternalNozzle.WallPoints(0.2809f)[0], shp.InternalNozzle.WallNormals()[0], 0.3167f * shp.InternalNozzle.Fluid.P);
-        PresureForceAndMoment(shp.InternalNozzle.WallPoints(0.2809f)[1], shp.InternalNozzle.WallNormals()[1], 0.3167f * shp.InternalNozzle.Fluid.P);
+        PresureForceAndMoment(shp.Nozzle.WallPoints(0.2809f)[0], shp.Nozzle.WallNormals()[0], 0.3167f * shp.Nozzle.Fluid.P);
+        PresureForceAndMoment(shp.Nozzle.WallPoints(0.2809f)[1], shp.Nozzle.WallNormals()[1], 0.3167f * shp.Nozzle.Fluid.P);
         // ! Stream Thrust
-        StreamForceAndMoment(Vector3.Lerp(shp.InternalNozzle.Inlet[0], shp.InternalNozzle.Inlet[^1], 0.5f), shp.InternalNozzle.FlowDir, (shp.InternalNozzle.Fluid.V - shp.Engine.Fluid.V) * massFlow);
-        InternalNozzleMesh = InternalNozzle.GetNozzleMesh(shp.InternalNozzle, _debug);
-
-
-        // ExternalNozzle -> Freestream => NOZZLE
-        Nozzle ExternalNozzle = new(shp.InternalNozzle.Fluid.P / Atmosphere.P);
-        shp.ExternalNozzle.Fluid = ExternalNozzle.GetParcel(shp.InternalNozzle.Fluid);
-        // ! Pressure Forces
-        PresureForceAndMoment(shp.ExternalNozzle.WallPoints(0.2809f)[0], shp.ExternalNozzle.WallNormals()[0], 0.3167f * shp.ExternalNozzle.Fluid.P);
-        // ! Stream Thrust
-        StreamForceAndMoment(Vector3.Lerp(shp.InternalNozzle.Outlet[0], shp.InternalNozzle.Outlet[^1], 0.5f), shp.ExternalNozzle.FlowDir, (shp.ExternalNozzle.Fluid.V - shp.InternalNozzle.Fluid.V) * massFlow);
-        // ! ExternalNozzle Mesh calculated later
+        StreamForceAndMoment(Vector3.Lerp(shp.Nozzle.Inlet[0], shp.Nozzle.Inlet[^1], 0.5f), shp.Nozzle.FlowDir, (shp.Nozzle.Fluid.V - shp.Engine.Fluid.V) * massFlow);
+        InternalNozzleMesh = Nozzle.GetNozzleMesh(shp.Nozzle, _debug);
 
 
         // NacelleRamp
@@ -277,25 +267,6 @@ public class VehiclePhysics : MonoBehaviour
         PresureForceAndMoment(shp.NacelleRamp.WallPoints(0.5f)[0], shp.NacelleRamp.WallNormals()[0], shp.NacelleRamp.Fluid.P);
 
 
-        float exhaustLength = 1f;
-        // UpperRamp -> Freestream => DEFLECT
-        // ! InternalStreams required to make this deflect shall be used to form the exhaust mesh
-        ExternalStream UpperTrail = new(shp.UpperRamp.Outlet[0], shp.UpperRamp.Outlet[0] + exhaustLength * shp.Length * shp.ExternalNozzle.FlowDir, true);
-        Deflect UpperTrailDeflect = new Deflect(shp.UpperRamp.AngleTo(UpperTrail), upper:true);
-        Parcel UpperTrailParcel = UpperTrailDeflect.GetParcel(shp.UpperRamp.Fluid);
-        UpperTrailDeflectMesh = UpperTrailDeflect.GetDeflectMesh(UpperTrail, effectLength * shp.Length, effectThickness, _debug);
-        //UpperTrailDeflectMesh = UpperTrailDeflect.GetDeflectMesh(UpperTrail, effectLength * shp.Length, UpperDeflectMesh.vertices[0], UpperDeflectMesh.vertices[^2] - UpperDeflectMesh.vertices[0], _debug);
-        
-
-        // Nacelle Ramp -> ExternalNozzle => DEFLECT
-        // ! InternalStreams required to make this deflect shall be used to form the exhaust mesh
-        ExternalStream LowerTrail = new(shp.NacelleRamp.Outlet[0], shp.NacelleRamp.Outlet[0] + exhaustLength * shp.Length * shp.ExternalNozzle.FlowDir, false);
-        Deflect LowerTrailDeflect = new Deflect(shp.NacelleRamp.AngleTo(LowerTrail));
-        Parcel LowerTrailParcel = LowerTrailDeflect.GetParcel(shp.NacelleRamp.Fluid);
-        LowerTrailDeflectMesh = LowerTrailDeflect.GetDeflectMesh(LowerTrail, effectLength * shp.Length, effectThickness, _debug);
-        //LowerTrailDeflectMesh = LowerTrailDeflect.GetDeflectMesh(LowerTrail, effectLength * shp.Length, InletDeflectMesh.vertices[0], InletDeflectMesh.vertices[^2] - InletDeflectMesh.vertices[0], _debug); // Might collide with inlet OR nacelle shock
-
-
         // -- Forces --
         if (!paused)
         {
@@ -309,8 +280,8 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // -- Temperature UVs (TUVs) --
-        shp.FuselageMesh.uv2 = new Vector2[] { TUV(shp.InletRamp.Fluid.T), TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.InternalNozzle.Fluid.T), TUV(shp.ExternalNozzle.Fluid.T), Vector2.zero};
-        shp.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.InternalNozzle.Fluid.T), Vector2.zero};
+        shp.FuselageMesh.uv2 = new Vector2[] { TUV(shp.InletRamp.Fluid.T), TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.Nozzle.Fluid.T), Vector2.zero};
+        shp.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.Nozzle.Fluid.T), Vector2.zero};
     }
 
     float LeverArm3(Vector3 point, Vector3 force)
