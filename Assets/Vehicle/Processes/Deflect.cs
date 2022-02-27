@@ -42,7 +42,7 @@ public class Deflect : Process
         else if (Theta < -Tol)
         {
             // Expansion Fan
-            ExpansionFan e = new ExpansionFan(Mathf.Abs(Theta));
+            Fan e = new Fan(Mathf.Abs(Theta));
             Parcel f = e.GetParcel(i);
             Angles = e.FanAngles;
             Chosen = e;
