@@ -22,9 +22,9 @@ public class ShapeInputs : MonoBehaviour
 
     float Angle_Inlet = 10f;
     float Angle_Engine = -10f;
-    float Angle_Nozzle = 0f;
+    float Angle_Nozzle = -5f;
 
-    float NozzleRatio = 10f;
+    public float NozzleRatio = 7f;
     float EngineHeight = 0.025f;
 
     public Mesh FuselageMesh;
@@ -80,7 +80,7 @@ public class ShapeInputs : MonoBehaviour
 
         // Engine and Nacelle
         fuselage[2] = fuselage[1] + new Vector3(Length_Engine * Mathf.Cos(Angle_Engine + Mathf.PI), Length_Engine * Mathf.Sin(Angle_Engine + Mathf.PI), 0f); // Engine Outlet
-        Vector3 nozzleAxis = new Vector3(Length_Nozzle * Mathf.Cos(Angle_Engine + Mathf.PI), Length_Nozzle * Mathf.Sin(Angle_Engine + Mathf.PI), 0f);
+        Vector3 nozzleAxis = new Vector3(Length_Nozzle * Mathf.Cos(Angle_Nozzle + Mathf.PI), Length_Nozzle * Mathf.Sin(Angle_Nozzle + Mathf.PI), 0f);
         nacelle[1] = fuselage[2] + new Vector3(EngineHeight * Mathf.Cos(Angle_Engine + 3f * Mathf.PI / 2f), EngineHeight * Mathf.Sin(Angle_Engine + 3f * Mathf.PI / 2f), 0f); // Nacelle Engine Outlet
         nacelle[0] = nacelle[1] + (fuselage[1] - fuselage[2]) * Length_Lip; // Engine Lip (other)
 
@@ -109,10 +109,10 @@ public class ShapeInputs : MonoBehaviour
 
         // -- Triangles --
         // Fuselage
-        fuselageTriangles = TrianglesAboutCentroid(fuselage);
+        fuselageTriangles = new int[12] { 4, 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0};
 
         // Triangles
-        nacelleTriangles = TrianglesAboutCentroid(nacelle);
+        nacelleTriangles = new int[9] { 3, 1, 0, 3, 2, 1, 3, 0, 2};
 
 
         // -- Fill Meshes --
@@ -137,26 +137,26 @@ public class ShapeInputs : MonoBehaviour
         Nozzle = new InternalStream(new Vector3[] { fuselage[2], nacelle[1] }, new Vector3[] { fuselage[3], nacelle[2] });
     }
 
-    public int[] TrianglesAboutCentroid(Vector3[] vertices)
-    {
-        int[] triangles = new int[vertices.Length * 3];
-        for (int i = 0; i < vertices.Length - 1; i++)
-        {
-            int j = 3 * i; // triangle iterator
-            triangles[j] = vertices.Length - 1; // centre point
-            triangles[j + 1] = i;
+    //public int[] TrianglesAboutCentroid(Vector3[] vertices)
+    //{
+    //    int[] triangles = new int[vertices.Length * 3];
+    //    for (int i = 0; i < vertices.Length - 1; i++)
+    //    {
+    //        int j = 3 * i; // triangle iterator
+    //        triangles[j] = vertices.Length - 1; // centre point
+    //        triangles[j + 1] = i;
 
-            if (i + 1 == vertices.Length - 1)
-            {
-                triangles[j + 2] = 0; // return to origin point
-            }
-            else
-            {
-                triangles[j + 2] = i + 1;
-            }
-        }
-        return triangles;
-    }
+    //        if (i + 1 == vertices.Length - 1)
+    //        {
+    //            triangles[j + 2] = 0; // return to origin point
+    //        }
+    //        else
+    //        {
+    //            triangles[j + 2] = i + 1;
+    //        }
+    //    }
+    //    return triangles;
+    //}
 
     float TriangleArea(Vector3 p0, Vector3 p1, Vector3 p2)
     {

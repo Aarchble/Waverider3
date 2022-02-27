@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 108080721}
   m_Layer: 0
   m_Name: Vehicle
-  m_TagString: Untagged
+  m_TagString: Moving
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -183,7 +183,7 @@ MonoBehaviour:
   effectLength: 0
   effectThickness: 0
   paused: 0
-  Speed: 0
+  Speed: 2484
   AoA: 0
 --- !u!50 &108080719
 Rigidbody2D:

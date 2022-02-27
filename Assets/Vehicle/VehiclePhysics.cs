@@ -99,40 +99,40 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // -- Flow Effects --
-        int flowVisLayer = 1;
-        shockMat.SetVector("_velocityVector", rb.GetRelativeVector(Velocity).normalized);
+        //int flowVisLayer = 1;
+        //shockMat.SetVector("_velocityVector", rb.GetRelativeVector(Velocity).normalized);
 
         // Draw InletRamp effects
         // ! Shock / Expansion Fan
-        Graphics.DrawMesh(InletDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // InletRamp [Shock / Expansion Fan]
+        //Graphics.DrawMesh(InletDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // InletRamp [Shock / Expansion Fan]
 
 
         // Draw UpperRamp effects
         // ! Shock / Expansion Fan
-        Graphics.DrawMesh(UpperDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // UpperRamp [Shock / Expansion Fan]
+        //Graphics.DrawMesh(UpperDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // UpperRamp [Shock / Expansion Fan]
 
 
         // Draw Engine effects
         // ! PreShock
-        Graphics.DrawMesh(EngineShockMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Engine PreShock [Shock]
+        //Graphics.DrawMesh(EngineShockMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Engine PreShock [Shock]
         // ! Combustion
-        Graphics.DrawMesh(EngineCombustionMesh, transform.position, transform.rotation, exhaustMat, flowVisLayer); // Engine Combustion [Combustion]
+        //Graphics.DrawMesh(EngineCombustionMesh, transform.position, transform.rotation, exhaustMat, flowVisLayer); // Engine Combustion [Combustion]
 
 
         // Draw InternalNozzle effects
         // ! Exhaust
-        Graphics.DrawMesh(InternalNozzleMesh, transform.position, transform.rotation, exhaustMat, flowVisLayer); // Internal Nozzle [Exhaust]
+        //Graphics.DrawMesh(InternalNozzleMesh, transform.position, transform.rotation, exhaustMat, flowVisLayer); // Internal Nozzle [Exhaust]
 
 
         // Draw Nacelle effects
         // ! Shock / Expansion Fan
-        Graphics.DrawMesh(NacelleDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Nacelle Ramp [Shock / Expansion Fan]
+        //Graphics.DrawMesh(NacelleDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Nacelle Ramp [Shock / Expansion Fan]
 
 
         // Draw Trailing effects
         // ! Shock / Expansion Fan
-        Graphics.DrawMesh(UpperTrailDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Upper Trailing [Shock / Expansion Fan]
-        Graphics.DrawMesh(LowerTrailDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Lower Trailing [Shock / Expansion Fan]
+        //Graphics.DrawMesh(UpperTrailDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Upper Trailing [Shock / Expansion Fan]
+        //Graphics.DrawMesh(LowerTrailDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Lower Trailing [Shock / Expansion Fan]
 
 
         // Combined Internal Flow effects
@@ -217,13 +217,11 @@ public class VehiclePhysics : MonoBehaviour
             // ! Engine shock exits the combustion chamber through the nozzle, combustion unlikely
             Debug.Log("Insufficient Combustion!");
             shp.Engine.Fluid = preEngine;
-            EngineCombustionMesh = new Mesh();
         }
         else
         {
             Combustion EngineCombustion = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
             shp.Engine.Fluid = EngineCombustion.GetParcel(preEngine); // update to engine fluid post-combustion
-            EngineCombustionMesh = EngineCombustion.GetCombustionMesh(shp.Engine, EngineShockMesh.vertices[0], EngineShockMesh.vertices[1], _debug);
         }
         
         // ! Pressure Forces
@@ -234,16 +232,14 @@ public class VehiclePhysics : MonoBehaviour
         StreamForceAndMoment(Vector3.Lerp(shp.Engine.Inlet[0], shp.Engine.Inlet[^1], 0.5f), shp.Engine.FlowDir, (shp.Engine.Fluid.V - preEngine.V) * massFlow);
 
 
-        // InternalNozzle -> Exhaust => NOZZLE
-        float internalAreaRatio = (shp.Nozzle.Outlet[^1] - shp.Nozzle.Outlet[0]).magnitude / (shp.Nozzle.Inlet[^1] - shp.Nozzle.Inlet[0]).magnitude;
-        Nozzle Nozzle = new(internalAreaRatio);
+        // Nozzle -> Exhaust => NOZZLE
+        Nozzle Nozzle = new(shp.NozzleRatio);
         shp.Nozzle.Fluid = Nozzle.GetParcel(shp.Engine.Fluid);
         // ! Pressure Forces
         PresureForceAndMoment(shp.Nozzle.WallPoints(0.2809f)[0], shp.Nozzle.WallNormals()[0], 0.3167f * shp.Nozzle.Fluid.P);
         PresureForceAndMoment(shp.Nozzle.WallPoints(0.2809f)[1], shp.Nozzle.WallNormals()[1], 0.3167f * shp.Nozzle.Fluid.P);
         // ! Stream Thrust
         StreamForceAndMoment(Vector3.Lerp(shp.Nozzle.Inlet[0], shp.Nozzle.Inlet[^1], 0.5f), shp.Nozzle.FlowDir, (shp.Nozzle.Fluid.V - shp.Engine.Fluid.V) * massFlow);
-        InternalNozzleMesh = Nozzle.GetNozzleMesh(shp.Nozzle, _debug);
 
 
         // NacelleRamp
@@ -282,6 +278,12 @@ public class VehiclePhysics : MonoBehaviour
         // -- Temperature UVs (TUVs) --
         shp.FuselageMesh.uv2 = new Vector2[] { TUV(shp.InletRamp.Fluid.T), TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.Nozzle.Fluid.T), Vector2.zero};
         shp.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.Nozzle.Fluid.T), Vector2.zero};
+
+        Debug.Log("Inlet: " + shp.InletRamp.Fluid.M);
+        Debug.Log("Engine: " + shp.Engine.Fluid.M);
+        Debug.Log("Nozzle: " + shp.Nozzle.Fluid.M);
+        Debug.Log("Nacelle: " + shp.NacelleRamp.Fluid.M);
+        Debug.Log("Upper: " + shp.UpperRamp.Fluid.M);
     }
 
     float LeverArm3(Vector3 point, Vector3 force)
