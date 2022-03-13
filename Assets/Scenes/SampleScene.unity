@@ -161,6 +161,7 @@ MonoBehaviour:
   NacelleStructureFilter: {fileID: 0}
   Length: 5
   Width: 1
+  NozzleRatio: 7
   FuselageMesh: {fileID: 0}
   NacelleMesh: {fileID: 0}
 --- !u!114 &108080718
@@ -197,7 +198,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 1000
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1

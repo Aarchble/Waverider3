@@ -209,7 +209,7 @@ public class VehiclePhysics : MonoBehaviour
         EngineShockMesh = EngineShock.GetDeflectMesh(shp.Engine, effectThickness, _debug);
 
 
-        // Engine -> InternalNozzle => COMBUST
+        // Engine -> Nozzle => COMBUST
         float minCombustionLength = 0.0f; // not dimensionless
         // ! Check both upper and lower lengths of engine
         if (Vector3.Dot(shp.Engine.Outlet[0] - EngineShockMesh.vertices[0], shp.Engine.FlowDir) < minCombustionLength || Vector3.Dot(shp.Engine.Outlet[^1] - EngineShockMesh.vertices[1], shp.Engine.FlowDir) < minCombustionLength)
@@ -263,6 +263,14 @@ public class VehiclePhysics : MonoBehaviour
         PresureForceAndMoment(shp.NacelleRamp.WallPoints(0.5f)[0], shp.NacelleRamp.WallNormals()[0], shp.NacelleRamp.Fluid.P);
 
 
+        // Exhaust -> UpperRamp => EXHAUST
+        Exhaust UpperExhaust = new(shp.UpperRamp.Fluid, shp.NozzleExpansionAngle, shp.NozzleExitRadius);
+
+
+        // Exhaust -> NacelleRamp => EXHAUST
+        Exhaust NacelleExhaust = new(shp.NacelleRamp.Fluid, shp.NozzleExpansionAngle, shp.NozzleExitRadius);
+
+
         // -- Forces --
         if (!paused)
         {
@@ -281,7 +289,7 @@ public class VehiclePhysics : MonoBehaviour
 
         Debug.Log("Inlet: " + shp.InletRamp.Fluid.M);
         Debug.Log("Engine: " + shp.Engine.Fluid.M);
-        Debug.Log("Nozzle: " + shp.Nozzle.Fluid.M);
+        Debug.Log("Nozzle: " + shp.Nozzle.Fluid.P);
         Debug.Log("Nacelle: " + shp.NacelleRamp.Fluid.M);
         Debug.Log("Upper: " + shp.UpperRamp.Fluid.M);
     }

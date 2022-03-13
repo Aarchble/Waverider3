@@ -26,6 +26,8 @@ public class ShapeInputs : MonoBehaviour
 
     public float NozzleRatio = 7f;
     float EngineHeight = 0.025f;
+    public float NozzleExpansionAngle;
+    public float NozzleExitRadius;
 
     public Mesh FuselageMesh;
     public Mesh NacelleMesh;
@@ -88,7 +90,9 @@ public class ShapeInputs : MonoBehaviour
         Vector3 nozzleEntryPlane = (nacelle[1] - fuselage[2]);
         Vector3 nozzleExitCentre = fuselage[2] + 0.5f * nozzleEntryPlane + nozzleAxis;
         fuselage[3] = nozzleExitCentre + 0.5f * nozzleEntryPlane.magnitude * NozzleRatio * Vector3.Cross(nozzleAxis, Vector3.forward).normalized;
-        nacelle[2] = nozzleExitCentre + 0.5f * nozzleEntryPlane.magnitude * NozzleRatio * Vector3.Cross(nozzleAxis, Vector3.back).normalized; // Internal Nozzle Outlet
+        nacelle[2] = nozzleExitCentre + 0.5f * nozzleEntryPlane.magnitude * NozzleRatio * Vector3.Cross(nozzleAxis, Vector3.back).normalized;
+        NozzleExpansionAngle = Vector3.Angle(nozzleAxis, fuselage[3] - fuselage[2]) * Mathf.Deg2Rad;
+        NozzleExitRadius = (0.5f * nozzleEntryPlane.magnitude * NozzleRatio * Vector3.Cross(nozzleAxis, Vector3.forward).normalized).magnitude;
 
 
         // -- Centroids --
