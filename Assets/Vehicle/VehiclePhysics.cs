@@ -19,15 +19,17 @@ public class VehiclePhysics : MonoBehaviour
     float Moment;
     Vector3 Velocity;
 
-    Mesh InletDeflectMesh;
-    Mesh UpperDeflectMesh;
-    Mesh EngineShockMesh;
-    Mesh EngineCombustionMesh;
-    Mesh InternalNozzleMesh;
-    Mesh ExternalNozzleMesh;
-    Mesh NacelleDeflectMesh;
-    Mesh UpperTrailDeflectMesh;
-    Mesh LowerTrailDeflectMesh;
+    //Mesh InletDeflectMesh;
+    //Mesh UpperDeflectMesh;
+    //Mesh EngineShockMesh;
+    //Mesh EngineCombustionMesh;
+    //Mesh InternalNozzleMesh;
+    //Mesh ExternalNozzleMesh;
+    //Mesh NacelleDeflectMesh;
+    //Mesh UpperTrailDeflectMesh;
+    //Mesh LowerTrailDeflectMesh;
+
+    List<Mesh> DeflectMeshes;
 
     //Material inletMat;
     //Material upperMat;
@@ -172,6 +174,8 @@ public class VehiclePhysics : MonoBehaviour
         // Need to use the following equation to keep calculating velocity while paused
         //Vector3 velocity = new(Velocity * Mathf.Cos(-AoA * Mathf.Deg2Rad), Velocity * Mathf.Sin(-AoA * Mathf.Deg2Rad), 0f);
 
+        DeflectMeshes = new();
+
         // -- RESET DYNAMICS --
         Force = Vector3.zero;
         Moment = 0f;
@@ -191,7 +195,7 @@ public class VehiclePhysics : MonoBehaviour
         shp.InletRamp.Fluid = InletDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
         PresureForceAndMoment(shp.InletRamp.WallPoints(0.5f)[0], shp.InletRamp.WallNormals()[0], shp.InletRamp.Fluid.P);
-        InletDeflectMesh = InletDeflect.GetDeflectMesh(shp.InletRamp, effectLength * shp.Length, effectThickness, shp.Engine.Inlet[^1], shp.Engine.Outlet[^1] - shp.Engine.Inlet[^1], _debug);
+        DeflectMeshes.AddRange(InletDeflect.GetDeflectMesh(shp.InletRamp, effectLength * shp.Length, effectThickness, shp.Engine.Inlet[^1], shp.Engine.Outlet[^1] - shp.Engine.Inlet[^1], _debug));
 
 
         // Freestream -> UpperRamp => DEFLECT
@@ -199,20 +203,20 @@ public class VehiclePhysics : MonoBehaviour
         shp.UpperRamp.Fluid = UpperDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
         PresureForceAndMoment(shp.UpperRamp.WallPoints(0.5f)[0], shp.UpperRamp.WallNormals()[0], shp.UpperRamp.Fluid.P); // negative wall vector for upper
-        UpperDeflectMesh = UpperDeflect.GetDeflectMesh(shp.UpperRamp, effectLength * shp.Length, effectThickness, _debug);
+        DeflectMeshes.AddRange(UpperDeflect.GetDeflectMesh(shp.UpperRamp, effectLength * shp.Length, effectThickness, _debug));
 
         
         // InletRamp -> Engine => DEFLECT (SHOCK)
         Deflect EngineShock = new(shp.InletRamp.AngleTo(shp.Engine), internalFlow:true); // Abs forces deflect into shock
         Parcel preEngine = EngineShock.GetParcel(shp.InletRamp.Fluid); // engine fluid pre-combustion
         // ! This pressure doesn't act anywhere significant
-        EngineShockMesh = EngineShock.GetDeflectMesh(shp.Engine, effectThickness, _debug);
+        DeflectMeshes.AddRange(EngineShock.GetDeflectMesh(shp.Engine, effectThickness, _debug)); // This will always be a shock, hence only adds one Mesh to list. 
 
 
         // Engine -> Nozzle => COMBUST
         float minCombustionLength = 0.0f; // not dimensionless
         // ! Check both upper and lower lengths of engine
-        if (Vector3.Dot(shp.Engine.Outlet[0] - EngineShockMesh.vertices[0], shp.Engine.FlowDir) < minCombustionLength || Vector3.Dot(shp.Engine.Outlet[^1] - EngineShockMesh.vertices[1], shp.Engine.FlowDir) < minCombustionLength)
+        if (Vector3.Dot(shp.Engine.Outlet[0] - EngineShock.featureVertices[0], shp.Engine.FlowDir) < minCombustionLength || Vector3.Dot(shp.Engine.Outlet[^1] - EngineShock.featureVertices[1], shp.Engine.FlowDir) < minCombustionLength)
         {
             // ! Engine shock exits the combustion chamber through the nozzle, combustion unlikely
             Debug.Log("Insufficient Combustion!");
@@ -249,7 +253,7 @@ public class VehiclePhysics : MonoBehaviour
             // InletRamp -> NacelleRamp => DEFLECT
             Deflect NacelleDeflect = new Deflect(shp.InletRamp.AngleTo(shp.NacelleRamp));
             shp.NacelleRamp.Fluid = NacelleDeflect.GetParcel(shp.InletRamp.Fluid);
-            NacelleDeflectMesh = NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, InletDeflectMesh.vertices[0], InletDeflectMesh.vertices[^2] - InletDeflectMesh.vertices[0], _debug);
+            DeflectMeshes.AddRange(NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, InletDeflect.featureVertices[0], InletDeflect.featureVertices[^1] - InletDeflect.featureVertices[0], _debug));
             // NacelleDeflectMesh encapsulated by inletDeflectMesh
         }
         else
@@ -257,7 +261,7 @@ public class VehiclePhysics : MonoBehaviour
             // Freestream -> NacelleRamp => DEFLECT
             Deflect NacelleDeflect = new Deflect(freeStream.AngleTo(shp.NacelleRamp));
             shp.NacelleRamp.Fluid = NacelleDeflect.GetParcel(freeStream.Fluid);
-            NacelleDeflectMesh = NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, _debug);
+            DeflectMeshes.AddRange(NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, _debug));
         }
         // ! Pressure Forces
         PresureForceAndMoment(shp.NacelleRamp.WallPoints(0.5f)[0], shp.NacelleRamp.WallNormals()[0], shp.NacelleRamp.Fluid.P);
@@ -265,10 +269,12 @@ public class VehiclePhysics : MonoBehaviour
 
         // Exhaust -> UpperRamp => EXHAUST
         Exhaust UpperExhaust = new(shp.UpperRamp.Fluid, shp.NozzleExpansionAngle, shp.NozzleExitRadius);
+        Parcel upperPlume = UpperExhaust.GetParcel(shp.Nozzle.Fluid);
 
 
         // Exhaust -> NacelleRamp => EXHAUST
         Exhaust NacelleExhaust = new(shp.NacelleRamp.Fluid, shp.NozzleExpansionAngle, shp.NozzleExitRadius);
+        Parcel NacellePlume = NacelleExhaust.GetParcel(shp.Nozzle.Fluid);
 
 
         // -- Forces --

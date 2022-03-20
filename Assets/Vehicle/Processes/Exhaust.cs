@@ -7,7 +7,6 @@ public class Exhaust : Expansion
     Parcel Exit;
     float NozzleAngle;
     float NozzleRadius;
-    Vector3[] jetBoundary;
 
     public Exhaust(Parcel e, float nozzleAngle, float nozzleRadius)
     {
@@ -22,8 +21,8 @@ public class Exhaust : Expansion
         float dr = 0.1f;
         int n = 5;
 
-        jetBoundary = new Vector3[n];
-        jetBoundary[0] = new Vector3(0f, 1f);
+        featureVertices = new Vector3[n];
+        featureVertices[0] = new Vector3(0f, 1f);
         float M = Exit.M;
 
         float ARe = SonicArea(i.Gamma, Exit.M);
@@ -31,11 +30,11 @@ public class Exhaust : Expansion
 
         for (int seg = 1; seg < n; seg++)
         {
-            jetBoundary[seg] = new Vector3(0f, jetBoundary[seg - 1].y + dr);
-            float AR = jetBoundary[seg].y * jetBoundary[seg].y * ARe;
+            featureVertices[seg] = new Vector3(0f, featureVertices[seg - 1].y + dr);
+            float AR = featureVertices[seg].y * featureVertices[seg].y * ARe;
             M = SonicAreaMach(i.Gamma, AR);
             float theta = PrandtlMeyerAngle(i.Gamma, M) - PrandtlMeyerAngle(Exit.Gamma, Exit.M);
-            jetBoundary[seg].x = dr / Mathf.Tan(alpha - theta) + jetBoundary[seg - 1].x;
+            featureVertices[seg].x = dr / Mathf.Tan(alpha - theta) + featureVertices[seg - 1].x;
         }
 
         float Tratio = (1f + (i.Gamma - 1f) / 2f * i.M * i.M) / (1f + (i.Gamma - 1f) / 2f * M * M);
@@ -46,4 +45,9 @@ public class Exhaust : Expansion
 
         return final;
     }
+
+    //public Mesh GetExhaustMesh()
+    //{
+
+    //}
 }
