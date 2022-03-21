@@ -101,7 +101,12 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // -- Flow Effects --
-        //int flowVisLayer = 1;
+        int flowVisLayer = 1;
+        foreach (Mesh defl in DeflectMeshes)
+        {
+            Graphics.DrawMesh(defl, transform.position, transform.rotation, shockMat, flowVisLayer);
+        }
+
         //shockMat.SetVector("_velocityVector", rb.GetRelativeVector(Velocity).normalized);
 
         // Draw InletRamp effects
@@ -195,7 +200,7 @@ public class VehiclePhysics : MonoBehaviour
         shp.InletRamp.Fluid = InletDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
         PresureForceAndMoment(shp.InletRamp.WallPoints(0.5f)[0], shp.InletRamp.WallNormals()[0], shp.InletRamp.Fluid.P);
-        DeflectMeshes.AddRange(InletDeflect.GetDeflectMesh(shp.InletRamp, effectLength * shp.Length, effectThickness, shp.Engine.Inlet[^1], shp.Engine.Outlet[^1] - shp.Engine.Inlet[^1], _debug));
+        AddDrawnMesh(DeflectMeshes, InletDeflect.GetDeflectMesh(shp.InletRamp, effectLength * shp.Length, effectThickness, shp.Engine.Inlet[^1], shp.Engine.Outlet[^1] - shp.Engine.Inlet[^1], _debug));
 
 
         // Freestream -> UpperRamp => DEFLECT
@@ -203,14 +208,14 @@ public class VehiclePhysics : MonoBehaviour
         shp.UpperRamp.Fluid = UpperDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
         PresureForceAndMoment(shp.UpperRamp.WallPoints(0.5f)[0], shp.UpperRamp.WallNormals()[0], shp.UpperRamp.Fluid.P); // negative wall vector for upper
-        DeflectMeshes.AddRange(UpperDeflect.GetDeflectMesh(shp.UpperRamp, effectLength * shp.Length, effectThickness, _debug));
+        AddDrawnMesh(DeflectMeshes, UpperDeflect.GetDeflectMesh(shp.UpperRamp, effectLength * shp.Length, effectThickness, _debug));
 
         
         // InletRamp -> Engine => DEFLECT (SHOCK)
         Deflect EngineShock = new(shp.InletRamp.AngleTo(shp.Engine), internalFlow:true); // Abs forces deflect into shock
         Parcel preEngine = EngineShock.GetParcel(shp.InletRamp.Fluid); // engine fluid pre-combustion
         // ! This pressure doesn't act anywhere significant
-        DeflectMeshes.AddRange(EngineShock.GetDeflectMesh(shp.Engine, effectThickness, _debug)); // This will always be a shock, hence only adds one Mesh to list. 
+        AddDrawnMesh(DeflectMeshes, EngineShock.GetDeflectMesh(shp.Engine, effectThickness, _debug)); // This will always be a shock, hence only adds one Mesh to list. 
 
 
         // Engine -> Nozzle => COMBUST
@@ -253,7 +258,7 @@ public class VehiclePhysics : MonoBehaviour
             // InletRamp -> NacelleRamp => DEFLECT
             Deflect NacelleDeflect = new Deflect(shp.InletRamp.AngleTo(shp.NacelleRamp));
             shp.NacelleRamp.Fluid = NacelleDeflect.GetParcel(shp.InletRamp.Fluid);
-            DeflectMeshes.AddRange(NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, InletDeflect.featureVertices[0], InletDeflect.featureVertices[^1] - InletDeflect.featureVertices[0], _debug));
+            AddDrawnMesh(DeflectMeshes, NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, InletDeflect.featureVertices[0], InletDeflect.featureVertices[^1] - InletDeflect.featureVertices[0], _debug));
             // NacelleDeflectMesh encapsulated by inletDeflectMesh
         }
         else
@@ -261,7 +266,7 @@ public class VehiclePhysics : MonoBehaviour
             // Freestream -> NacelleRamp => DEFLECT
             Deflect NacelleDeflect = new Deflect(freeStream.AngleTo(shp.NacelleRamp));
             shp.NacelleRamp.Fluid = NacelleDeflect.GetParcel(freeStream.Fluid);
-            DeflectMeshes.AddRange(NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, _debug));
+            AddDrawnMesh(DeflectMeshes, NacelleDeflect.GetDeflectMesh(shp.NacelleRamp, effectLength * shp.Length, effectThickness, _debug));
         }
         // ! Pressure Forces
         PresureForceAndMoment(shp.NacelleRamp.WallPoints(0.5f)[0], shp.NacelleRamp.WallNormals()[0], shp.NacelleRamp.Fluid.P);
@@ -334,6 +339,14 @@ public class VehiclePhysics : MonoBehaviour
     {
         // Edge Temperature UV
         return new Vector2(temperature, 1f);
+    }
+
+    void AddDrawnMesh(List<Mesh> drawnMeshes, Mesh[] meshes)
+    {
+        if (meshes != null)
+        {
+            drawnMeshes.AddRange(meshes);
+        }
     }
 
 }
