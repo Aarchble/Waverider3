@@ -30,6 +30,7 @@ public class VehiclePhysics : MonoBehaviour
     //Mesh LowerTrailDeflectMesh;
 
     List<Mesh> DeflectMeshes;
+    List<Mesh> ExhaustMeshes;
 
     //Material inletMat;
     //Material upperMat;
@@ -106,6 +107,13 @@ public class VehiclePhysics : MonoBehaviour
         {
             Graphics.DrawMesh(defl, transform.position, transform.rotation, shockMat, flowVisLayer);
         }
+        //Debug.Log("Deflect count: " + DeflectMeshes.Count);
+        //Debug.Log("Exhaust count: " + ExhaustMeshes.Count);
+
+        foreach (Mesh exh in ExhaustMeshes)
+        {
+            Graphics.DrawMesh(exh, transform.position, transform.rotation, shockMat, flowVisLayer);
+        }
 
         //shockMat.SetVector("_velocityVector", rb.GetRelativeVector(Velocity).normalized);
 
@@ -180,6 +188,7 @@ public class VehiclePhysics : MonoBehaviour
         //Vector3 velocity = new(Velocity * Mathf.Cos(-AoA * Mathf.Deg2Rad), Velocity * Mathf.Sin(-AoA * Mathf.Deg2Rad), 0f);
 
         DeflectMeshes = new();
+        ExhaustMeshes = new();
 
         // -- RESET DYNAMICS --
         Force = Vector3.zero;
@@ -273,13 +282,15 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // Exhaust -> UpperRamp => EXHAUST
-        Exhaust UpperExhaust = new(shp.UpperRamp.Fluid, shp.NozzleExpansionAngle, shp.NozzleExitRadius);
+        Exhaust UpperExhaust = new(shp.UpperRamp.Fluid, shp.NozzleExpansionAngle, shp.NozzleExitRadius, upper:true);
         Parcel upperPlume = UpperExhaust.GetParcel(shp.Nozzle.Fluid);
+        AddDrawnMesh(ExhaustMeshes, UpperExhaust.GetExhaustMesh(shp.Nozzle, effectThickness));
 
 
         // Exhaust -> NacelleRamp => EXHAUST
         Exhaust NacelleExhaust = new(shp.NacelleRamp.Fluid, shp.NozzleExpansionAngle, shp.NozzleExitRadius);
         Parcel NacellePlume = NacelleExhaust.GetParcel(shp.Nozzle.Fluid);
+        AddDrawnMesh(ExhaustMeshes, NacelleExhaust.GetExhaustMesh(shp.Nozzle, effectThickness));
 
 
         // -- Forces --
@@ -298,11 +309,11 @@ public class VehiclePhysics : MonoBehaviour
         shp.FuselageMesh.uv2 = new Vector2[] { TUV(shp.InletRamp.Fluid.T), TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.Nozzle.Fluid.T), Vector2.zero};
         shp.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(shp.Engine.Fluid.T), TUV(shp.Nozzle.Fluid.T), Vector2.zero};
 
-        Debug.Log("Inlet: " + shp.InletRamp.Fluid.M);
-        Debug.Log("Engine: " + shp.Engine.Fluid.M);
-        Debug.Log("Nozzle: " + shp.Nozzle.Fluid.P);
-        Debug.Log("Nacelle: " + shp.NacelleRamp.Fluid.M);
-        Debug.Log("Upper: " + shp.UpperRamp.Fluid.M);
+        //Debug.Log("Inlet: " + shp.InletRamp.Fluid.M);
+        //Debug.Log("Engine: " + shp.Engine.Fluid.M);
+        //Debug.Log("Nozzle: " + shp.Nozzle.Fluid.P);
+        //Debug.Log("Nacelle: " + shp.NacelleRamp.Fluid.M);
+        //Debug.Log("Upper: " + shp.UpperRamp.Fluid.M);
     }
 
     float LeverArm3(Vector3 point, Vector3 force)

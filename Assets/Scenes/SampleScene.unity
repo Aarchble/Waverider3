@@ -162,6 +162,8 @@ MonoBehaviour:
   Length: 5
   Width: 1
   NozzleRatio: 7
+  NozzleExpansionAngle: 0
+  NozzleExitRadius: 0
   FuselageMesh: {fileID: 0}
   NacelleMesh: {fileID: 0}
 --- !u!114 &108080718
@@ -178,11 +180,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   structMat: {fileID: 0}
   heatMat: {fileID: 0}
-  shockMat: {fileID: 0}
+  shockMat: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   combustionMat: {fileID: 0}
   exhaustMat: {fileID: 0}
   effectLength: 0
-  effectThickness: 0
+  effectThickness: 0.01
   paused: 0
   Speed: 2484
   AoA: 0
