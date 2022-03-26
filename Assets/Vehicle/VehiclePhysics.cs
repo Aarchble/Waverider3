@@ -107,8 +107,6 @@ public class VehiclePhysics : MonoBehaviour
         {
             Graphics.DrawMesh(defl, transform.position, transform.rotation, shockMat, flowVisLayer);
         }
-        //Debug.Log("Deflect count: " + DeflectMeshes.Count);
-        //Debug.Log("Exhaust count: " + ExhaustMeshes.Count);
 
         foreach (Mesh exh in ExhaustMeshes)
         {

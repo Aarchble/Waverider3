@@ -183,7 +183,7 @@ MonoBehaviour:
   shockMat: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   combustionMat: {fileID: 0}
   exhaustMat: {fileID: 0}
-  effectLength: 0
+  effectLength: 1
   effectThickness: 0.01
   paused: 0
   Speed: 2484
