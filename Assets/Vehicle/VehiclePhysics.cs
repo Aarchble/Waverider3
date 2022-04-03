@@ -19,16 +19,6 @@ public class VehiclePhysics : MonoBehaviour
     float Moment;
     Vector3 Velocity;
 
-    //Mesh InletDeflectMesh;
-    //Mesh UpperDeflectMesh;
-    //Mesh EngineShockMesh;
-    //Mesh EngineCombustionMesh;
-    //Mesh InternalNozzleMesh;
-    //Mesh ExternalNozzleMesh;
-    //Mesh NacelleDeflectMesh;
-    //Mesh UpperTrailDeflectMesh;
-    //Mesh LowerTrailDeflectMesh;
-
     List<Mesh> DeflectMeshes;
     List<Mesh> ExhaustMeshes;
 
@@ -113,50 +103,6 @@ public class VehiclePhysics : MonoBehaviour
             Graphics.DrawMesh(exh, transform.position, transform.rotation, shockMat, flowVisLayer);
         }
 
-        //shockMat.SetVector("_velocityVector", rb.GetRelativeVector(Velocity).normalized);
-
-        // Draw InletRamp effects
-        // ! Shock / Expansion Fan
-        //Graphics.DrawMesh(InletDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // InletRamp [Shock / Expansion Fan]
-
-
-        // Draw UpperRamp effects
-        // ! Shock / Expansion Fan
-        //Graphics.DrawMesh(UpperDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // UpperRamp [Shock / Expansion Fan]
-
-
-        // Draw Engine effects
-        // ! PreShock
-        //Graphics.DrawMesh(EngineShockMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Engine PreShock [Shock]
-        // ! Combustion
-        //Graphics.DrawMesh(EngineCombustionMesh, transform.position, transform.rotation, exhaustMat, flowVisLayer); // Engine Combustion [Combustion]
-
-
-        // Draw InternalNozzle effects
-        // ! Exhaust
-        //Graphics.DrawMesh(InternalNozzleMesh, transform.position, transform.rotation, exhaustMat, flowVisLayer); // Internal Nozzle [Exhaust]
-
-
-        // Draw Nacelle effects
-        // ! Shock / Expansion Fan
-        //Graphics.DrawMesh(NacelleDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Nacelle Ramp [Shock / Expansion Fan]
-
-
-        // Draw Trailing effects
-        // ! Shock / Expansion Fan
-        //Graphics.DrawMesh(UpperTrailDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Upper Trailing [Shock / Expansion Fan]
-        //Graphics.DrawMesh(LowerTrailDeflectMesh, transform.position, transform.rotation, shockMat, flowVisLayer); // Lower Trailing [Shock / Expansion Fan]
-
-
-        // Combined Internal Flow effects
-        //CombineInstance[] internalFlowCombine = new CombineInstance[2];
-        //internalFlowCombine[0].mesh = EngineCombustionMesh;
-        //internalFlowCombine[0].transform = transform.localToWorldMatrix;
-        //internalFlowCombine[1].mesh = InternalNozzleMesh;
-        //internalFlowCombine[1].transform = transform.localToWorldMatrix;
-        //Mesh internalFlowMesh = new Mesh();
-        //internalFlowMesh.CombineMeshes(internalFlowCombine);
-        //Graphics.DrawMesh(internalFlowMesh, transform.position, transform.rotation, internalNozzleMat, flowVisLayer);
     }
 
     // Update is called once per frame

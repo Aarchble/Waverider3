@@ -31,6 +31,7 @@ public class ShapeInputs : MonoBehaviour
 
     public Mesh FuselageMesh;
     public Mesh NacelleMesh;
+    public Mesh InternalsMesh;
 
     Vector3 Centroid;
 
@@ -67,6 +68,7 @@ public class ShapeInputs : MonoBehaviour
         // -- Initialise Variables --
         FuselageMesh = new Mesh();
         NacelleMesh = new Mesh();
+        InternalsMesh = new Mesh();
 
         Vector3[] fuselage = new Vector3[4];
         Vector3[] nacelle = new Vector3[3];
@@ -122,9 +124,11 @@ public class ShapeInputs : MonoBehaviour
         // -- Fill Meshes --
         FuselageMesh.vertices = fuselage;
         NacelleMesh.vertices = nacelle;
+        InternalsMesh.vertices = new Vector3[] { fuselage[0], nacelle[0], nacelle[2], fuselage[3], fuselage[1] };
 
         FuselageMesh.triangles = fuselageTriangles;
         NacelleMesh.triangles = nacelleTriangles;
+        InternalsMesh.triangles = new int[] { 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4 };
 
         // -- Set UVs --
         FuselageMesh.uv3 = new Vector2[5] { fuselage[0] - fuselage[4], fuselage[1] - fuselage[4], fuselage[2] - fuselage[4], fuselage[3] - fuselage[4], Vector2.zero };

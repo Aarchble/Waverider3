@@ -21,8 +21,9 @@ public class Exhaust : Expansion
     public override Parcel GetParcel(Parcel i)
     {
         // Mn = i.M
-        float dr = 0.1f;
-        int n = 10;
+        float dr = 0.2f;
+        int n = 20;
+        float lenLim = 10f;
 
         jetBoundary = new();
         jetBoundary.Add(new Vector3(0f, 1f));
@@ -38,7 +39,7 @@ public class Exhaust : Expansion
             M = SonicAreaMach(i.Gamma, AR);
             float theta = PrandtlMeyerAngle(i.Gamma, M) - PrandtlMeyerAngle(Exit.Gamma, Exit.M);
             newPoint.x = dr / Mathf.Tan(alpha - theta) + jetBoundary[seg - 1].x;
-            if (newPoint.x < jetBoundary[seg - 1].x)
+            if (newPoint.x < jetBoundary[seg - 1].x || newPoint.x > lenLim)
             {
                 break;
             }
