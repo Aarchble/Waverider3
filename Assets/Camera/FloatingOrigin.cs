@@ -17,9 +17,14 @@ public class FloatingOrigin : MonoBehaviour
 
         if (cameraPosition.magnitude > threshold)
         {
-            foreach (GameObject g in GameObject.FindGameObjectsWithTag("Moving"))
+            foreach (GameObject g in GameObject.FindGameObjectsWithTag("movingXY"))
             {
                 g.transform.position -= cameraPosition; // Move each object back to origin
+            }
+
+            foreach (GameObject g in GameObject.FindGameObjectsWithTag("movingY"))
+            {
+                g.transform.position -= new Vector3(0f, cameraPosition.y); // Move each object back to origin
             }
 
             TotalDisplacement += cameraPosition;

@@ -2,14 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShapeInputs : MonoBehaviour
+public class Airframe
 {
-    // -- GameObjects --
-    public GameObject Fuselage;
-    public GameObject Nacelle;
-    public MeshFilter FuselageStructureFilter;
-    public MeshFilter NacelleStructureFilter;
-
     // -- Inputs --
     public float Length = 5f;
     public float Width = 1f;
@@ -44,13 +38,9 @@ public class ShapeInputs : MonoBehaviour
     public NearStream Engine;
     public NearStream Nozzle;
 
-    void Start()
+    public Airframe()
     {
         // -- Prepare Inputs --
-        // Prepare GameObject Pointers(ish)
-        FuselageStructureFilter = Fuselage.GetComponent<MeshFilter>();
-        NacelleStructureFilter = Nacelle.GetComponent<MeshFilter>();
-
         // Length Fractions
         Length_Inlet *= Length;
         Length_Engine *= Length;
@@ -128,11 +118,7 @@ public class ShapeInputs : MonoBehaviour
 
         FuselageMesh.triangles = fuselageTriangles;
         NacelleMesh.triangles = nacelleTriangles;
-        InternalsMesh.triangles = new int[] { 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4 };
-
-        // -- Set UVs --
-        FuselageMesh.uv3 = new Vector2[5] { fuselage[0] - fuselage[4], fuselage[1] - fuselage[4], fuselage[2] - fuselage[4], fuselage[3] - fuselage[4], Vector2.zero };
-        NacelleMesh.uv3 = new Vector2[4] { nacelle[0] - nacelle[3], nacelle[1] - nacelle[3], nacelle[2] - nacelle[3], Vector2.zero };
+        InternalsMesh.triangles = new int[] { 1, 2, 4, 2, 3, 4, 3, 0, 4 };
 
 
         // -- Build Streams --
