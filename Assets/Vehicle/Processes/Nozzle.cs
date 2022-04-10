@@ -24,7 +24,7 @@ public class Nozzle : Expansion
         float Pratio = Mathf.Pow(Tratio, i.Gamma / (i.Gamma - 1f));
 
         // -- !verified --
-        Parcel final = new(i.R, i.Gamma, 1f / Pratio * i.P, Tratio * i.T);
+        Parcel final = new(i.R, i.Gamma, Pratio * i.P, Tratio * i.T);
         final.SetMach(M2);
 
         return final;

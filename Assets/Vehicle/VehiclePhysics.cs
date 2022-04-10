@@ -6,9 +6,11 @@ public class VehiclePhysics : MonoBehaviour
 {
     public Material structMat;
     public Material internalsMat;
+    public Material wingMat;
     public Material shockMat;
 
     Airframe afm;
+    Wing wng;
     Rigidbody2D rb;
     FlightControls fcs;
 
@@ -36,6 +38,7 @@ public class VehiclePhysics : MonoBehaviour
     void Start()
     {
         afm = new();
+        wng = new(new Vector3(-0.5f, 0.1f), afm.Length / 2f, 0.5f * afm.Width, 3f, 3f);
         rb = GetComponent<Rigidbody2D>();
         fcs = GetComponent<FlightControls>();
 
@@ -57,6 +60,7 @@ public class VehiclePhysics : MonoBehaviour
         Graphics.DrawMesh(afm.InternalsMesh, transform.position, transform.rotation, internalsMat, 0);
         Graphics.DrawMesh(afm.FuselageMesh, transform.position, transform.rotation, structMat, 0);
         Graphics.DrawMesh(afm.NacelleMesh, transform.position, transform.rotation, structMat, 0);
+        Graphics.DrawMesh(wng.WingMesh, transform.position, transform.rotation, wingMat, 0);
 
         // Heating
 
@@ -118,11 +122,13 @@ public class VehiclePhysics : MonoBehaviour
         //Debug.Log("Inlet Deflect Angle " + freeStream.AngleTo(afm.InletRamp));
 
         // -- Flow Streams --
+
+        // FUSELAGE
         // Freestream -> InletRamp => DEFLECT
         Deflect InletDeflect = new Deflect(freeStream.AngleTo(afm.InletRamp));
         afm.InletRamp.Fluid = InletDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
-        PresureForceAndMoment(afm.InletRamp.WallPoints(0.5f)[0], afm.InletRamp.WallNormals()[0], afm.InletRamp.Fluid.P);
+        PressureForceAndMoment(afm.InletRamp.WallPoints(0.5f)[0], afm.InletRamp.WallNormals()[0], afm.InletRamp.Fluid.P);
         AddDrawnMesh(DeflectMeshes, InletDeflect.GetDeflectMesh(afm.InletRamp, effectLength * afm.Length, effectThickness, afm.Engine.Inlet[^1], afm.Engine.Outlet[^1] - afm.Engine.Inlet[^1], _debug));
 
 
@@ -130,7 +136,7 @@ public class VehiclePhysics : MonoBehaviour
         Deflect UpperDeflect = new Deflect(freeStream.AngleTo(afm.UpperRamp), upper:true);
         afm.UpperRamp.Fluid = UpperDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
-        PresureForceAndMoment(afm.UpperRamp.WallPoints(0.5f)[0], afm.UpperRamp.WallNormals()[0], afm.UpperRamp.Fluid.P); // negative wall vector for upper
+        PressureForceAndMoment(afm.UpperRamp.WallPoints(0.5f)[0], afm.UpperRamp.WallNormals()[0], afm.UpperRamp.Fluid.P); // negative wall vector for upper
         AddDrawnMesh(DeflectMeshes, UpperDeflect.GetDeflectMesh(afm.UpperRamp, effectLength * afm.Length, effectThickness, _debug));
 
         
@@ -157,8 +163,8 @@ public class VehiclePhysics : MonoBehaviour
         }
         
         // ! Pressure Forces
-        PresureForceAndMoment(afm.Engine.WallPoints(0.5f)[0], afm.Engine.WallNormals()[0], afm.Engine.Fluid.P);
-        PresureForceAndMoment(afm.Engine.WallPoints(0.5f)[1], afm.Engine.WallNormals()[1], afm.Engine.Fluid.P);
+        PressureForceAndMoment(afm.Engine.WallPoints(0.5f)[0], afm.Engine.WallNormals()[0], afm.Engine.Fluid.P);
+        PressureForceAndMoment(afm.Engine.WallPoints(0.5f)[1], afm.Engine.WallNormals()[1], afm.Engine.Fluid.P);
         // ! Stream Thrust
         float massFlow = afm.Engine.Fluid.Rho * afm.Engine.Fluid.V * (afm.Engine.Inlet[1] - afm.Engine.Inlet[0]).magnitude * afm.Width;
         StreamForceAndMoment(Vector3.Lerp(afm.Engine.Inlet[0], afm.Engine.Inlet[^1], 0.5f), afm.Engine.FlowDir, (afm.Engine.Fluid.V - preEngine.V) * massFlow);
@@ -168,8 +174,8 @@ public class VehiclePhysics : MonoBehaviour
         Nozzle Nozzle = new(afm.NozzleRatio);
         afm.Nozzle.Fluid = Nozzle.GetParcel(afm.Engine.Fluid);
         // ! Pressure Forces
-        PresureForceAndMoment(afm.Nozzle.WallPoints(0.2809f)[0], afm.Nozzle.WallNormals()[0], 0.3167f * afm.Nozzle.Fluid.P);
-        PresureForceAndMoment(afm.Nozzle.WallPoints(0.2809f)[1], afm.Nozzle.WallNormals()[1], 0.3167f * afm.Nozzle.Fluid.P);
+        PressureForceAndMoment(afm.Nozzle.WallPoints(0.2809f)[0], afm.Nozzle.WallNormals()[0], 0.3167f * afm.Nozzle.Fluid.P);
+        PressureForceAndMoment(afm.Nozzle.WallPoints(0.2809f)[1], afm.Nozzle.WallNormals()[1], 0.3167f * afm.Nozzle.Fluid.P);
         // ! Stream Thrust
         StreamForceAndMoment(Vector3.Lerp(afm.Nozzle.Inlet[0], afm.Nozzle.Inlet[^1], 0.5f), afm.Nozzle.FlowDir, (afm.Nozzle.Fluid.V - afm.Engine.Fluid.V) * massFlow);
 
@@ -192,7 +198,7 @@ public class VehiclePhysics : MonoBehaviour
             AddDrawnMesh(DeflectMeshes, NacelleDeflect.GetDeflectMesh(afm.NacelleRamp, effectLength * afm.Length, effectThickness, _debug));
         }
         // ! Pressure Forces
-        PresureForceAndMoment(afm.NacelleRamp.WallPoints(0.5f)[0], afm.NacelleRamp.WallNormals()[0], afm.NacelleRamp.Fluid.P);
+        PressureForceAndMoment(afm.NacelleRamp.WallPoints(0.5f)[0], afm.NacelleRamp.WallNormals()[0], afm.NacelleRamp.Fluid.P);
 
 
         // Exhaust -> UpperRamp => EXHAUST
@@ -205,6 +211,23 @@ public class VehiclePhysics : MonoBehaviour
         Exhaust NacelleExhaust = new(afm.NacelleRamp.Fluid, afm.NozzleExpansionAngle, afm.NozzleExitRadius);
         Parcel NacellePlume = NacelleExhaust.GetParcel(afm.Nozzle.Fluid);
         AddDrawnMesh(ExhaustMeshes, NacelleExhaust.GetExhaustMesh(afm.Nozzle, effectThickness));
+
+
+        // WING
+        Deflect UpperLeadWingDeflect = new Deflect(freeStream.AngleTo(wng.UpperLead));
+        Deflect LowerLeadWingDeflect = new Deflect(freeStream.AngleTo(wng.LowerLead));
+        Deflect UpperTrailWingDeflect = new Deflect(wng.UpperLead.AngleTo(wng.UpperTrail));
+        Deflect LowerTrailWingDeflect = new Deflect(wng.LowerLead.AngleTo(wng.LowerTrail));
+
+        wng.UpperLead.Fluid = UpperLeadWingDeflect.GetParcel(freeStream.Fluid);
+        wng.LowerLead.Fluid = LowerLeadWingDeflect.GetParcel(freeStream.Fluid);
+        wng.UpperTrail.Fluid = UpperTrailWingDeflect.GetParcel(wng.UpperLead.Fluid);
+        wng.LowerTrail.Fluid = LowerTrailWingDeflect.GetParcel(wng.LowerLead.Fluid);
+
+        PressureForceAndMoment(wng.UpperLead.WallPoints(0.5f)[0], wng.UpperLead.WallNormals()[0], wng.UpperLead.Fluid.P);
+        PressureForceAndMoment(wng.LowerLead.WallPoints(0.5f)[0], wng.LowerLead.WallNormals()[0], wng.LowerLead.Fluid.P);
+        PressureForceAndMoment(wng.UpperTrail.WallPoints(0.5f)[0], wng.UpperTrail.WallNormals()[0], wng.UpperTrail.Fluid.P);
+        PressureForceAndMoment(wng.LowerTrail.WallPoints(0.5f)[0], wng.LowerTrail.WallNormals()[0], wng.LowerTrail.Fluid.P);
 
 
         // -- Forces --
@@ -223,11 +246,11 @@ public class VehiclePhysics : MonoBehaviour
         afm.FuselageMesh.uv2 = new Vector2[] { TUV(afm.InletRamp.Fluid.T), TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
         afm.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
 
-        //Debug.Log("Inlet: " + afm.InletRamp.Fluid.M);
-        //Debug.Log("Engine: " + afm.Engine.Fluid.M);
-        //Debug.Log("Nozzle: " + afm.Nozzle.Fluid.P);
-        //Debug.Log("Nacelle: " + afm.NacelleRamp.Fluid.M);
-        //Debug.Log("Upper: " + afm.UpperRamp.Fluid.M);
+        Debug.Log("Inlet: " + afm.InletRamp.Fluid.P);
+        Debug.Log("Engine: " + afm.Engine.Fluid.P);
+        Debug.Log("Nozzle: " + afm.Nozzle.Fluid.P);
+        Debug.Log("Nacelle: " + afm.NacelleRamp.Fluid.P);
+        Debug.Log("Upper: " + afm.UpperRamp.Fluid.P);
     }
 
     float LeverArm3(Vector3 point, Vector3 force)
@@ -236,7 +259,7 @@ public class VehiclePhysics : MonoBehaviour
         return Vector3.Dot(point, Vector3.Cross(force, Vector3.forward).normalized); //seems right
     }
 
-    void PresureForceAndMoment(Vector3 point, Vector3 vector, float pressure)
+    void PressureForceAndMoment(Vector3 point, Vector3 vector, float pressure)
     {
         //point: afm.NacelleRamp.WallPoints(0.5f)[0]
         //force: +/-afm.NacelleRamp.WallVectors()[0]

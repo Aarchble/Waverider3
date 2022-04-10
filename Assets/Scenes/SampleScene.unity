@@ -156,6 +156,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   structMat: {fileID: 2100000, guid: 33362355b0495fd499d1586e6d4f5e9f, type: 2}
   internalsMat: {fileID: 2100000, guid: bdda6f092b2b2f643b4b031bc79a73d4, type: 2}
+  wingMat: {fileID: 2100000, guid: 10bf73bd1f33c5c48a1d35e504ccaa5f, type: 2}
   shockMat: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   effectLength: 1
   effectThickness: 0.01
