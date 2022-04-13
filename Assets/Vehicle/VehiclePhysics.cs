@@ -38,7 +38,7 @@ public class VehiclePhysics : MonoBehaviour
     void Start()
     {
         afm = new();
-        wng = new(new Vector3(-0.5f, 0.1f), afm.Length / 2f, 0.5f * afm.Width, 3f, 3f);
+        wng = new(new Vector3(-1f, 0.1f), afm.Length / 2f, 0.5f * afm.Width, 3f, 3f);
         rb = GetComponent<Rigidbody2D>();
         fcs = GetComponent<FlightControls>();
 
@@ -76,6 +76,10 @@ public class VehiclePhysics : MonoBehaviour
         {
             Graphics.DrawMesh(exh, transform.position, transform.rotation, shockMat, 1);
         }
+
+        Vector3 leverArm = (Moment / Force.magnitude) * Vector3.Cross(Force, Vector3.forward).normalized;
+        ThickLine drawCoP = new(leverArm, leverArm + Force, effectThickness);
+        Graphics.DrawMesh(drawCoP.GetMesh(), transform.position, transform.rotation, shockMat, 1);
 
     }
 
@@ -224,10 +228,10 @@ public class VehiclePhysics : MonoBehaviour
         wng.UpperTrail.Fluid = UpperTrailWingDeflect.GetParcel(wng.UpperLead.Fluid);
         wng.LowerTrail.Fluid = LowerTrailWingDeflect.GetParcel(wng.LowerLead.Fluid);
 
-        PressureForceAndMoment(wng.UpperLead.WallPoints(0.5f)[0], wng.UpperLead.WallNormals()[0], wng.UpperLead.Fluid.P);
-        PressureForceAndMoment(wng.LowerLead.WallPoints(0.5f)[0], wng.LowerLead.WallNormals()[0], wng.LowerLead.Fluid.P);
-        PressureForceAndMoment(wng.UpperTrail.WallPoints(0.5f)[0], wng.UpperTrail.WallNormals()[0], wng.UpperTrail.Fluid.P);
-        PressureForceAndMoment(wng.LowerTrail.WallPoints(0.5f)[0], wng.LowerTrail.WallNormals()[0], wng.LowerTrail.Fluid.P);
+        //PressureForceAndMoment(wng.UpperLead.WallPoints(0.5f)[0], wng.UpperLead.WallNormals()[0], wng.UpperLead.Fluid.P);
+        //PressureForceAndMoment(wng.LowerLead.WallPoints(0.5f)[0], wng.LowerLead.WallNormals()[0], wng.LowerLead.Fluid.P);
+        //PressureForceAndMoment(wng.UpperTrail.WallPoints(0.5f)[0], wng.UpperTrail.WallNormals()[0], wng.UpperTrail.Fluid.P);
+        //PressureForceAndMoment(wng.LowerTrail.WallPoints(0.5f)[0], wng.LowerTrail.WallNormals()[0], wng.LowerTrail.Fluid.P);
 
 
         // -- Forces --
@@ -246,11 +250,11 @@ public class VehiclePhysics : MonoBehaviour
         afm.FuselageMesh.uv2 = new Vector2[] { TUV(afm.InletRamp.Fluid.T), TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
         afm.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
 
-        Debug.Log("Inlet: " + afm.InletRamp.Fluid.P);
-        Debug.Log("Engine: " + afm.Engine.Fluid.P);
-        Debug.Log("Nozzle: " + afm.Nozzle.Fluid.P);
-        Debug.Log("Nacelle: " + afm.NacelleRamp.Fluid.P);
-        Debug.Log("Upper: " + afm.UpperRamp.Fluid.P);
+        //Debug.Log("Inlet: " + afm.InletRamp.Fluid.P);
+        //Debug.Log("Engine: " + afm.Engine.Fluid.P);
+        //Debug.Log("Nozzle: " + afm.Nozzle.Fluid.P);
+        //Debug.Log("Nacelle: " + afm.NacelleRamp.Fluid.P);
+        //Debug.Log("Upper: " + afm.UpperRamp.Fluid.P);
     }
 
     float LeverArm3(Vector3 point, Vector3 force)
