@@ -38,7 +38,7 @@ public class VehiclePhysics : MonoBehaviour
     void Start()
     {
         afm = new();
-        wng = new(new Vector3(-1f, 0.1f), afm.Length / 2f, 0.5f * afm.Width, 3f, 3f);
+        wng = new(new Vector3(-2.5f, 0.1f), afm.Length / 2f, 0.5f * afm.Width, 3f, 5f);
         rb = GetComponent<Rigidbody2D>();
         fcs = GetComponent<FlightControls>();
 
@@ -78,15 +78,17 @@ public class VehiclePhysics : MonoBehaviour
         }
 
         Vector3 leverArm = (Moment / Force.magnitude) * Vector3.Cross(Force, Vector3.forward).normalized;
-        ThickLine drawCoP = new(leverArm, leverArm + Force, effectThickness);
+        ThickLine drawCoP = new(leverArm, leverArm + Force / 10000f, effectThickness * 2f);
         Graphics.DrawMesh(drawCoP.GetMesh(), transform.position, transform.rotation, shockMat, 1);
+        ThickLine drawLvr = new(Vector3.zero, leverArm, effectThickness);
+        Graphics.DrawMesh(drawLvr.GetMesh(), transform.position, transform.rotation, shockMat, 1);
 
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        Debug.Log("-- Fixed Update Start --");
         if (paused && !wasPaused)
         {
             // Stop
@@ -218,9 +220,9 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // WING
-        Deflect UpperLeadWingDeflect = new Deflect(freeStream.AngleTo(wng.UpperLead));
+        Deflect UpperLeadWingDeflect = new Deflect(freeStream.AngleTo(wng.UpperLead), upper:true);
         Deflect LowerLeadWingDeflect = new Deflect(freeStream.AngleTo(wng.LowerLead));
-        Deflect UpperTrailWingDeflect = new Deflect(wng.UpperLead.AngleTo(wng.UpperTrail));
+        Deflect UpperTrailWingDeflect = new Deflect(wng.UpperLead.AngleTo(wng.UpperTrail), upper:true);
         Deflect LowerTrailWingDeflect = new Deflect(wng.LowerLead.AngleTo(wng.LowerTrail));
 
         wng.UpperLead.Fluid = UpperLeadWingDeflect.GetParcel(freeStream.Fluid);
@@ -228,10 +230,10 @@ public class VehiclePhysics : MonoBehaviour
         wng.UpperTrail.Fluid = UpperTrailWingDeflect.GetParcel(wng.UpperLead.Fluid);
         wng.LowerTrail.Fluid = LowerTrailWingDeflect.GetParcel(wng.LowerLead.Fluid);
 
-        //PressureForceAndMoment(wng.UpperLead.WallPoints(0.5f)[0], wng.UpperLead.WallNormals()[0], wng.UpperLead.Fluid.P);
-        //PressureForceAndMoment(wng.LowerLead.WallPoints(0.5f)[0], wng.LowerLead.WallNormals()[0], wng.LowerLead.Fluid.P);
-        //PressureForceAndMoment(wng.UpperTrail.WallPoints(0.5f)[0], wng.UpperTrail.WallNormals()[0], wng.UpperTrail.Fluid.P);
-        //PressureForceAndMoment(wng.LowerTrail.WallPoints(0.5f)[0], wng.LowerTrail.WallNormals()[0], wng.LowerTrail.Fluid.P);
+        PressureForceAndMoment(wng.UpperLead.WallPoints(0.5f)[0], wng.UpperLead.WallNormals()[0], wng.UpperLead.Fluid.P);
+        PressureForceAndMoment(wng.LowerLead.WallPoints(0.5f)[0], wng.LowerLead.WallNormals()[0], wng.LowerLead.Fluid.P);
+        PressureForceAndMoment(wng.UpperTrail.WallPoints(0.5f)[0], wng.UpperTrail.WallNormals()[0], wng.UpperTrail.Fluid.P);
+        PressureForceAndMoment(wng.LowerTrail.WallPoints(0.5f)[0], wng.LowerTrail.WallNormals()[0], wng.LowerTrail.Fluid.P);
 
 
         // -- Forces --
@@ -240,10 +242,10 @@ public class VehiclePhysics : MonoBehaviour
             //Debug.Log("Force: " + Force);
             //Debug.Log("Moment: " + Moment);
             rb.AddRelativeForce(Force);
-            //rb.AddTorque(Moment);
+            rb.AddTorque(Moment);
         }
 
-        rb.rotation = fcs.PitchInceptor;
+        //rb.rotation = fcs.PitchInceptor;
 
 
         // -- Temperature UVs (TUVs) --
@@ -270,6 +272,7 @@ public class VehiclePhysics : MonoBehaviour
         Vector3 force = pressure * afm.Width * -vector;
         Force += force;
         Moment += Mathf.Abs(force.magnitude) * LeverArm3(point, force);
+        Debug.Log(force + ", " + LeverArm3(point, force));
         if (_debug)
         {
             Debug.DrawRay(rb.GetRelativePoint(point), rb.GetRelativeVector(force.normalized));
