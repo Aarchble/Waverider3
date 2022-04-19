@@ -131,7 +131,7 @@ public class VehiclePhysics : MonoBehaviour
 
         // FUSELAGE
         // Freestream -> InletRamp => DEFLECT
-        Deflect InletDeflect = new Deflect(freeStream.AngleTo(afm.InletRamp));
+        Deflect InletDeflect = new Deflect(freeStream, afm.InletRamp);
         afm.InletRamp.Fluid = InletDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
         PressureForceAndMoment(afm.InletRamp.WallPoints(0.5f)[0], afm.InletRamp.WallNormals()[0], afm.InletRamp.Fluid.P);
@@ -139,7 +139,7 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // Freestream -> UpperRamp => DEFLECT
-        Deflect UpperDeflect = new Deflect(freeStream.AngleTo(afm.UpperRamp), upper:true);
+        Deflect UpperDeflect = new Deflect(freeStream, afm.UpperRamp);
         afm.UpperRamp.Fluid = UpperDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
         PressureForceAndMoment(afm.UpperRamp.WallPoints(0.5f)[0], afm.UpperRamp.WallNormals()[0], afm.UpperRamp.Fluid.P); // negative wall vector for upper
@@ -147,7 +147,7 @@ public class VehiclePhysics : MonoBehaviour
 
         
         // InletRamp -> Engine => DEFLECT (SHOCK)
-        Deflect EngineShock = new(afm.InletRamp.AngleTo(afm.Engine), internalFlow:true); // Abs forces deflect into shock
+        Deflect EngineShock = new(afm.InletRamp, afm.Engine); // Abs forces deflect into shock
         Parcel preEngine = EngineShock.GetParcel(afm.InletRamp.Fluid); // engine fluid pre-combustion
         // ! This pressure doesn't act anywhere significant
         AddDrawnMesh(DeflectMeshes, EngineShock.GetDeflectMesh(afm.Engine, effectThickness, _debug)); // This will always be a shock, hence only adds one Mesh to list. 
@@ -164,7 +164,7 @@ public class VehiclePhysics : MonoBehaviour
         }
         else
         {
-            Combustion EngineCombustion = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
+            Combust EngineCombustion = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
             afm.Engine.Fluid = EngineCombustion.GetParcel(preEngine); // update to engine fluid post-combustion
         }
         
@@ -177,7 +177,7 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // Nozzle -> Exhaust => NOZZLE
-        Nozzle Nozzle = new(afm.NozzleRatio);
+        AreaChange Nozzle = new(afm.NozzleRatio);
         afm.Nozzle.Fluid = Nozzle.GetParcel(afm.Engine.Fluid);
         // ! Pressure Forces
         PressureForceAndMoment(afm.Nozzle.WallPoints(0.2809f)[0], afm.Nozzle.WallNormals()[0], 0.3167f * afm.Nozzle.Fluid.P);
@@ -191,7 +191,7 @@ public class VehiclePhysics : MonoBehaviour
         if (InletDeflect.GetAngles()[^1] > afm.InletRamp.AngleToPoint(afm.InletRamp.Inlet[0], afm.Engine.Inlet[^1]))
         {
             // InletRamp -> NacelleRamp => DEFLECT
-            Deflect NacelleDeflect = new Deflect(afm.InletRamp.AngleTo(afm.NacelleRamp));
+            Deflect NacelleDeflect = new Deflect(afm.InletRamp, afm.NacelleRamp);
             afm.NacelleRamp.Fluid = NacelleDeflect.GetParcel(afm.InletRamp.Fluid);
             AddDrawnMesh(DeflectMeshes, NacelleDeflect.GetDeflectMesh(afm.NacelleRamp, effectLength * afm.Length, effectThickness, InletDeflect.featureVertices[0], InletDeflect.featureVertices[^1] - InletDeflect.featureVertices[0], _debug));
             // NacelleDeflectMesh encapsulated by inletDeflectMesh
@@ -199,7 +199,7 @@ public class VehiclePhysics : MonoBehaviour
         else
         {
             // Freestream -> NacelleRamp => DEFLECT
-            Deflect NacelleDeflect = new Deflect(freeStream.AngleTo(afm.NacelleRamp));
+            Deflect NacelleDeflect = new Deflect(freeStream, afm.NacelleRamp);
             afm.NacelleRamp.Fluid = NacelleDeflect.GetParcel(freeStream.Fluid);
             AddDrawnMesh(DeflectMeshes, NacelleDeflect.GetDeflectMesh(afm.NacelleRamp, effectLength * afm.Length, effectThickness, _debug));
         }
@@ -220,10 +220,10 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // WING
-        Deflect UpperLeadWingDeflect = new Deflect(freeStream.AngleTo(wng.UpperLead), upper:true);
-        Deflect LowerLeadWingDeflect = new Deflect(freeStream.AngleTo(wng.LowerLead));
-        Deflect UpperTrailWingDeflect = new Deflect(wng.UpperLead.AngleTo(wng.UpperTrail), upper:true);
-        Deflect LowerTrailWingDeflect = new Deflect(wng.LowerLead.AngleTo(wng.LowerTrail));
+        Deflect UpperLeadWingDeflect = new Deflect(freeStream, wng.UpperLead);
+        Deflect LowerLeadWingDeflect = new Deflect(freeStream, wng.LowerLead);
+        Deflect UpperTrailWingDeflect = new Deflect(wng.UpperLead, wng.UpperTrail);
+        Deflect LowerTrailWingDeflect = new Deflect(wng.LowerLead, wng.LowerTrail);
 
         wng.UpperLead.Fluid = UpperLeadWingDeflect.GetParcel(freeStream.Fluid);
         wng.LowerLead.Fluid = LowerLeadWingDeflect.GetParcel(freeStream.Fluid);
@@ -234,6 +234,8 @@ public class VehiclePhysics : MonoBehaviour
         PressureForceAndMoment(wng.LowerLead.WallPoints(0.5f)[0], wng.LowerLead.WallNormals()[0], wng.LowerLead.Fluid.P);
         PressureForceAndMoment(wng.UpperTrail.WallPoints(0.5f)[0], wng.UpperTrail.WallNormals()[0], wng.UpperTrail.Fluid.P);
         PressureForceAndMoment(wng.LowerTrail.WallPoints(0.5f)[0], wng.LowerTrail.WallNormals()[0], wng.LowerTrail.Fluid.P);
+
+        AddDrawnMesh(DeflectMeshes, UpperLeadWingDeflect.GetDeflectMesh(wng.UpperLead, effectThickness, _debug));
 
 
         // -- Forces --
@@ -249,14 +251,19 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // -- Temperature UVs (TUVs) --
-        afm.FuselageMesh.uv2 = new Vector2[] { TUV(afm.InletRamp.Fluid.T), TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
-        afm.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
+        //afm.FuselageMesh.uv2 = new Vector2[] { TUV(afm.InletRamp.Fluid.T), TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
+        //afm.NacelleMesh.uv2 = new Vector2[] { TUV(preEngine.T), TUV(afm.Engine.Fluid.T), TUV(afm.Nozzle.Fluid.T), Vector2.zero};
 
         //Debug.Log("Inlet: " + afm.InletRamp.Fluid.P);
         //Debug.Log("Engine: " + afm.Engine.Fluid.P);
         //Debug.Log("Nozzle: " + afm.Nozzle.Fluid.P);
         //Debug.Log("Nacelle: " + afm.NacelleRamp.Fluid.P);
         //Debug.Log("Upper: " + afm.UpperRamp.Fluid.P);
+    }
+
+    void Ramp()
+    {
+
     }
 
     float LeverArm3(Vector3 point, Vector3 force)

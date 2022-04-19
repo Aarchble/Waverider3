@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Nozzle : Expansion
+public class AreaChange : Expand
 {
     float Aratio;
 
-    public Nozzle(float aratio)
+    public AreaChange(float aratio)
     {
         Aratio = aratio;
     }

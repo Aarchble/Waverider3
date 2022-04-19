@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Combustion : Process
+public class Combust : Process
 {
     float Rb;
     float Gammab;
@@ -10,13 +10,13 @@ public class Combustion : Process
     float Fst;
     float H;
 
-    public Combustion(float rb, float gammab, float fst, float h)
+    public Combust(Fuel fuel)
     {
-        Rb = rb;
-        Gammab = gammab;
-        Fst = fst;
-        H = h;
-        Cpb = Gammab / (Gammab - 1f) * Rb;
+        Rb = fuel.Rb;
+        Gammab = fuel.Gammab;
+        Fst = fuel.Fst;
+        H = fuel.H;
+        Cpb = fuel.Cpb;
     }
 
     public override Parcel GetParcel(Parcel i)

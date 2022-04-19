@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Expansion : Process
+public abstract class Expand : Process
 {
     public float PrandtlMeyerAngle(float gamma, float M)
     {

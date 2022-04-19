@@ -11,20 +11,34 @@ public class Deflect : Process
     float InvertUpper;
     bool InternalFlow;
 
-    public Deflect(float theta, bool upper = false, bool internalFlow = false)
+    //public Deflect(float theta, bool upper = false, bool internalFlow = false)
+    //{
+    //    // Facade for Shocks and Expansion Fans for general cases (not internal flow where shock > expFan)
+
+    //    if (upper)
+    //    {
+    //        InvertUpper = -1f;
+    //    }
+    //    else
+    //    {
+    //        InvertUpper = 1f;
+    //    }
+
+    //    Theta = theta * InvertUpper;
+    //    Tol = 0.5f * Mathf.Deg2Rad;
+    //}
+
+    public Deflect(NearStream current, NearStream next)
     {
-        // Facade for Shocks and Expansion Fans for general cases (not internal flow where shock > expFan)
+        Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(current.WallNormals()[0], next.FlowDir) / (current.WallNormals()[0].magnitude * next.FlowDir.magnitude));
+        Tol = 0.5f * Mathf.Deg2Rad;
+    }
 
-        if (upper)
-        {
-            InvertUpper = -1f;
-        }
-        else
-        {
-            InvertUpper = 1f;
-        }
-
-        Theta = theta * InvertUpper;
+    public Deflect(FreeStream freeStream, NearStream next)
+    {
+        Vector3 freeNormal = Vector3.Cross(freeStream.FlowDir, Vector3.forward).normalized;
+        Vector3 matchNormal = Vector3.Dot(freeNormal, next.WallNormals()[0]) > 0 ? freeNormal : -freeNormal;
+        Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(matchNormal, next.FlowDir) / (matchNormal.magnitude * next.FlowDir.magnitude));
         Tol = 0.5f * Mathf.Deg2Rad;
     }
 

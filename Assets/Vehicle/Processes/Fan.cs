@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fan : Expansion
+public class Fan : Expand
 {
     float Theta;
     public float[] FanAngles;

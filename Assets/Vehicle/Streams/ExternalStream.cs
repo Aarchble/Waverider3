@@ -4,23 +4,19 @@ using UnityEngine;
 
 public class ExternalStream : NearStream
 {
-    Vector3[] _Inlet;
-    Vector3[] _Outlet;
-    Vector3 _FlowDir;
-    Parcel _Fluid;
     bool Upper;
 
     public ExternalStream(Vector3 inlet, Vector3 outlet, bool upper)
     {
         Upper = upper;
-        _Inlet = new Vector3[1] { inlet };
-        _Outlet = new Vector3[1] { outlet };
-        _FlowDir = Vector3.Normalize(_Outlet[0] - _Inlet[0]);
+        Inlet = new Vector3[1] { inlet };
+        Outlet = new Vector3[1] { outlet };
+        FlowDir = Vector3.Normalize(Outlet[0] - Inlet[0]);
     }
 
     public override Vector3[] WallPoints(float t)
     {
-        return new Vector3[1] { Vector3.Lerp(_Inlet[0], _Outlet[0], t) };
+        return new Vector3[1] { Vector3.Lerp(Inlet[0], Outlet[0], t) };
     }
 
     public override Vector3[] WallVectors()
@@ -32,35 +28,11 @@ public class ExternalStream : NearStream
     {
         if (Upper)
         {
-            return new Vector3[1] { Vector3.Cross(_Outlet[0] - _Inlet[0], Vector3.forward).normalized };
+            return new Vector3[1] { Vector3.Cross(Outlet[0] - Inlet[0], Vector3.forward).normalized };
         }
         else
         {
-            return new Vector3[1] { Vector3.Cross(_Outlet[0] - _Inlet[0], Vector3.back).normalized };
+            return new Vector3[1] { Vector3.Cross(Outlet[0] - Inlet[0], Vector3.back).normalized };
         }
-    }
-
-    public override Vector3 FlowDir
-    {
-        get { return _FlowDir; }
-        set { _FlowDir = value; }
-    }
-
-    public override Parcel Fluid
-    {
-        get { return _Fluid; }
-        set { _Fluid = value; }
-    }
-
-    public override Vector3[] Inlet
-    {
-        get { return _Inlet; }
-        set { _Inlet = value; }
-    }
-
-    public override Vector3[] Outlet
-    {
-        get { return _Outlet; }
-        set { _Outlet = value; }
     }
 }

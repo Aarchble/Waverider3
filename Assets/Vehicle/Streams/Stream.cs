@@ -4,8 +4,8 @@ using UnityEngine;
 
 public abstract class Stream
 {
-    public abstract Vector3 FlowDir { get; set; }
-    public abstract Parcel Fluid { get; set; }
+    public Vector3 FlowDir { get; set; }
+    public Parcel Fluid { get; set; }
 
     public float AngleTo(Stream other)
     {

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Exhaust : Expansion
+public class Exhaust : Expand
 {
     Parcel Exit;
     float NozzleAngle;
