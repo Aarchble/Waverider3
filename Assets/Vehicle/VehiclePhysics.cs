@@ -164,7 +164,7 @@ public class VehiclePhysics : MonoBehaviour
         }
         else
         {
-            Combust EngineCombustion = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
+            Combust EngineCombustion = new(new Fuel(290.3f, 1.238f, 0.0291f, 119.95e6f));
             afm.Engine.Fluid = EngineCombustion.GetParcel(preEngine); // update to engine fluid post-combustion
         }
         

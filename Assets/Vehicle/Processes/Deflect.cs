@@ -80,8 +80,11 @@ public class Deflect : Process
         }
     }
 
-    public Mesh[] GetDeflectMesh(NearStream nearStream, float length, float thickness, bool _debug = false)
+    public Mesh[] GetDeflectMesh(NearStream nearStream)
     {
+        float length = 5f;
+        float thickness = 0.01f;
+
         // NO MASK
         if (Theta > Tol)
         {
@@ -89,15 +92,6 @@ public class Deflect : Process
             Vector3 wave = nearStream.FlowDir + nearStream.WallNormals()[0] * nearStream.FlowDir.magnitude * Mathf.Tan(Angles[0]);
             featureVertices = new Vector3[] { nearStream.Inlet[0], nearStream.Inlet[0] + wave * length };
             ThickLine waveLine = new(featureVertices[0], featureVertices[1], thickness);
-
-            //mesh.vertices = new Vector3[4] { nearStream.Inlet[0], nearStream.Inlet[0] + waveThickness, nearStream.Inlet[0] + wave * length, nearStream.Inlet[0] + wave * length + waveThickness };
-            //mesh.uv = new Vector2[4] { new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 1f), new Vector2(1f, 1f) };
-            //mesh.triangles = new int[6] { 0, 2, 3, 3, 1, 0 };
-
-            //if (_debug)
-            //{
-            //    Debug.DrawRay(nearStream.Inlet[0], wave * length, Color.red);
-            //}
 
             return new Mesh[] { waveLine.GetMesh() };
         }
@@ -109,17 +103,6 @@ public class Deflect : Process
             featureVertices = new Vector3[] { nearStream.Inlet[0], nearStream.Inlet[0] + upstreamWave * length, nearStream.Inlet[0] + downstreamWave * length };
             ThickLine upstreamWaveLine = new(featureVertices[0], featureVertices[1], thickness);
             ThickLine downstreamWaveLine = new(featureVertices[0], featureVertices[2], thickness);
-
-            //Vector3 fanCentroid = new Vector3((fanVertices[0].x + fanVertices[1].x + fanVertices[2].x) / 3f, (fanVertices[0].y + fanVertices[1].y + fanVertices[2].y) / 3f);
-            //mesh.vertices = new Vector3[4] { fanVertices[0], fanVertices[1], fanVertices[2], fanCentroid };
-            //mesh.uv = new Vector2[4] { new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(0f, 0f)};
-            //mesh.triangles = new int[9] { 0, 2, 3, 2, 1, 3, 1, 0, 3 };
-
-            //if (_debug)
-            //{
-            //    Debug.DrawRay(nearStream.Inlet[0], upstreamWave * length, Color.green);
-            //    Debug.DrawRay(nearStream.Inlet[0], downstreamWave * length, Color.green);
-            //}
 
             return new Mesh[] { upstreamWaveLine.GetMesh(), downstreamWaveLine.GetMesh() };
         }
