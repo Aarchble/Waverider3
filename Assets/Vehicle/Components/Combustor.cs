@@ -15,11 +15,11 @@ public class Combustor : Component
 
     public Combustor(NearStream stream, Stream inStream, Fuel fuel)
     {
-        Isolator = inStream is NearStream nearIn ? new(nearIn, stream) : new((FreeStream)inStream, stream);
-        Injection = new(fuel);
-
         Up = inStream;
         Current = stream;
+
+        Isolator = inStream is NearStream nearIn ? new(nearIn, stream) : new((FreeStream)inStream, stream);
+        Injection = new(fuel);
     }
 
     public override void Operate()

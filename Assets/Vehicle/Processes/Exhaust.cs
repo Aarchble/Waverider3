@@ -10,12 +10,12 @@ public class Exhaust : Expand
     List<Vector3> jetBoundary;
     bool Upper;
 
-    public Exhaust(Parcel e, float nozzleAngle, float nozzleRadius, bool upper = false)
+    public Exhaust(NearStream nozzle, NearStream ambient)
     {
-        Exit = e;
-        NozzleAngle = nozzleAngle;
-        NozzleRadius = nozzleRadius;
-        Upper = upper;
+        Exit = ambient.Fluid;
+        NozzleAngle = Vector3.Angle(nozzle.FlowDir, nozzle.WallVectors()[0]) * Mathf.Deg2Rad;
+        NozzleRadius = (nozzle.Outlet[1] - nozzle.Outlet[0]).magnitude / 2f;
+        Upper = Vector3.Dot(ambient.WallNormals()[0], nozzle.WallNormals()[0]) < 0f;
     }
 
     public override Parcel GetParcel(Parcel i)

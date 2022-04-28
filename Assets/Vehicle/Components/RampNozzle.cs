@@ -20,4 +20,9 @@ public class RampNozzle : Component
     {
 
     }
+
+    public override void Operate()
+    {
+        throw new System.NotImplementedException();
+    }
 }

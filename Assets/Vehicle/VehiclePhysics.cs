@@ -143,7 +143,7 @@ public class VehiclePhysics : MonoBehaviour
         afm.UpperRamp.Fluid = UpperDeflect.GetParcel(freeStream.Fluid);
         // ! Pressure Forces
         PressureForceAndMoment(afm.UpperRamp.WallPoints(0.5f)[0], afm.UpperRamp.WallNormals()[0], afm.UpperRamp.Fluid.P); // negative wall vector for upper
-        AddDrawnMesh(DeflectMeshes, UpperDeflect.GetDeflectMesh(afm.UpperRamp, effectLength * afm.Length, effectThickness, _debug));
+        AddDrawnMesh(DeflectMeshes, UpperDeflect.GetDeflectMesh(afm.UpperRamp));
 
         
         // InletRamp -> Engine => DEFLECT (SHOCK)
@@ -201,20 +201,20 @@ public class VehiclePhysics : MonoBehaviour
             // Freestream -> NacelleRamp => DEFLECT
             Deflect NacelleDeflect = new Deflect(freeStream, afm.NacelleRamp);
             afm.NacelleRamp.Fluid = NacelleDeflect.GetParcel(freeStream.Fluid);
-            AddDrawnMesh(DeflectMeshes, NacelleDeflect.GetDeflectMesh(afm.NacelleRamp, effectLength * afm.Length, effectThickness, _debug));
+            AddDrawnMesh(DeflectMeshes, NacelleDeflect.GetDeflectMesh(afm.NacelleRamp));
         }
         // ! Pressure Forces
         PressureForceAndMoment(afm.NacelleRamp.WallPoints(0.5f)[0], afm.NacelleRamp.WallNormals()[0], afm.NacelleRamp.Fluid.P);
 
 
         // Exhaust -> UpperRamp => EXHAUST
-        Exhaust UpperExhaust = new(afm.UpperRamp.Fluid, afm.NozzleExpansionAngle, afm.NozzleExitRadius, upper:true);
+        Exhaust UpperExhaust = new(afm.Nozzle, afm.UpperRamp);
         Parcel upperPlume = UpperExhaust.GetParcel(afm.Nozzle.Fluid);
         AddDrawnMesh(ExhaustMeshes, UpperExhaust.GetExhaustMesh(afm.Nozzle, effectThickness));
 
 
         // Exhaust -> NacelleRamp => EXHAUST
-        Exhaust NacelleExhaust = new(afm.NacelleRamp.Fluid, afm.NozzleExpansionAngle, afm.NozzleExitRadius);
+        Exhaust NacelleExhaust = new(afm.Nozzle, afm.NacelleRamp);
         Parcel NacellePlume = NacelleExhaust.GetParcel(afm.Nozzle.Fluid);
         AddDrawnMesh(ExhaustMeshes, NacelleExhaust.GetExhaustMesh(afm.Nozzle, effectThickness));
 
