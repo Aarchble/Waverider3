@@ -21,7 +21,7 @@ public class InternalStream : NearStream
         return new Vector3[2] { Outlet[0] - Inlet[0], Outlet[1] - Inlet[1] };
     }
 
-    public override Vector3[] WallNormals()
+    public override Vector3[] WallNormals(Stream matchStream = null)
     {
         return new Vector3[2] { Vector3.Cross(Outlet[0] - Inlet[0], Vector3.back).normalized, Vector3.Cross(Outlet[1] - Inlet[1], Vector3.forward).normalized };
     }

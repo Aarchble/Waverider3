@@ -4,12 +4,21 @@ using UnityEngine;
 
 public abstract class Component
 {
+    // Streams
+    public Stream[] Up;
+    public NearStream[] Current;
+    public Stream[] Down;
+
+    // Properties
     public Vector3 Force;
     public float Moment;
     public float Width;
     public List<Mesh> DeflectMeshes;
+    public List<Mesh> ExhaustMeshes;
 
     public abstract void Operate();
+    //public abstract void GetOutput();
+    //public abstract void GetInput();
 
     float LeverArm3(Vector3 point, Vector3 force)
     {

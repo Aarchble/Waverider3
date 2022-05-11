@@ -5,42 +5,48 @@ using UnityEngine;
 public class Nozzle : Component
 {
     // Streams
-    Stream Up;
-    NearStream Current;
-    Stream[] Down;
+    //Stream Up;
+    //NearStream Current;
+    //NearStream[] Down;
 
     // Processes
     AreaChange Surface;
+    Exhaust UpperExhaust;
+    Exhaust LowerExhaust;
 
-    public Nozzle(NearStream stream, Stream inStream, Stream outUpper, Stream outLower)
+    public Nozzle(InternalStream stream, Stream inStream, Stream outUpper, Stream outLower, float width)
     {
-        Up = inStream;
-        Current = stream;
+        ExhaustMeshes = new();
+
+        Width = width;
+        Up = new Stream[] { inStream };
+        Current = new NearStream[] { stream };
         Down = new Stream[] { outUpper, outLower };
 
         Surface = new((stream.Outlet[1] - stream.Outlet[0]).magnitude / (stream.Inlet[1] - stream.Inlet[0]).magnitude);
+        UpperExhaust = new(Current[0], Down[0]);
+        LowerExhaust = new(Current[0], Down[1]);
     }
 
     public override void Operate()
     {
         // Nozzle -> Exhaust => NOZZLE
-        Current.Fluid = Surface.GetParcel(Up.Fluid);
+        Current[0].Fluid = Surface.GetParcel(Up[0].Fluid);
         // ! Pressure Forces
-        PressureForceAndMoment(Current.WallPoints(0.2809f)[0], Current.WallNormals()[0], 0.3167f * Current.Fluid.P);
-        PressureForceAndMoment(Current.WallPoints(0.2809f)[1], Current.WallNormals()[1], 0.3167f * Current.Fluid.P);
+        PressureForceAndMoment(Current[0].WallPoints(0.2809f)[0], Current[0].WallNormals()[0], 0.3167f * Current[0].Fluid.P);
+        PressureForceAndMoment(Current[0].WallPoints(0.2809f)[1], Current[0].WallNormals()[1], 0.3167f * Current[0].Fluid.P);
         // ! Stream Thrust
-        float massFlow = Up.Fluid.Rho * Up.Fluid.V * (Current.Inlet[1] - Current.Inlet[0]).magnitude * Width;
-        StreamForceAndMoment(Vector3.Lerp(Current.Inlet[0], Current.Inlet[^1], 0.5f), Current.FlowDir, (Current.Fluid.V - Up.Fluid.V) * massFlow);
+        float massFlow = Up[0].Fluid.Rho * Up[0].Fluid.V * (Current[0].Inlet[1] - Current[0].Inlet[0]).magnitude * Width;
+        StreamForceAndMoment(Vector3.Lerp(Current[0].Inlet[0], Current[0].Inlet[^1], 0.5f), Current[0].FlowDir, (Current[0].Fluid.V - Up[0].Fluid.V) * massFlow);
+
 
         // Exhaust -> UpperRamp => EXHAUST
-        //Exhaust UpperExhaust = new(afm.UpperRamp.Fluid, afm.NozzleExpansionAngle, afm.NozzleExitRadius, upper: true);
-        //Parcel upperPlume = UpperExhaust.GetParcel(afm.Nozzle.Fluid);
-        //AddDrawnMesh(ExhaustMeshes, UpperExhaust.GetExhaustMesh(afm.Nozzle, effectThickness));
+        Parcel upperPlume = UpperExhaust.GetParcel(Current[0].Fluid);
+        AddDrawnMesh(ExhaustMeshes, UpperExhaust.GetExhaustMesh(Current[0]));
 
 
-        //// Exhaust -> NacelleRamp => EXHAUST
-        //Exhaust NacelleExhaust = new(afm.NacelleRamp.Fluid, afm.NozzleExpansionAngle, afm.NozzleExitRadius);
-        //Parcel NacellePlume = NacelleExhaust.GetParcel(afm.Nozzle.Fluid);
-        //AddDrawnMesh(ExhaustMeshes, NacelleExhaust.GetExhaustMesh(afm.Nozzle, effectThickness));
+        // Exhaust -> NacelleRamp => EXHAUST
+        Parcel lowerPlume = LowerExhaust.GetParcel(Current[0].Fluid);
+        AddDrawnMesh(ExhaustMeshes, LowerExhaust.GetExhaustMesh(Current[0]));
     }
 }

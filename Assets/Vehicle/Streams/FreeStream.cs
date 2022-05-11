@@ -8,4 +8,11 @@ public class FreeStream : Stream
     {
         FlowDir = Vector3.Normalize(flowDir);
     }
+
+    public override Vector3[] WallNormals(Stream matchStream = null)
+    {
+        Vector3 freeNormal = Vector3.Cross(FlowDir, Vector3.forward).normalized;
+        Vector3 matchNormal = Vector3.Dot(freeNormal, matchStream.WallNormals()[0]) > 0 ? freeNormal : -freeNormal;
+        return new Vector3[1] { matchNormal };
+    }
 }

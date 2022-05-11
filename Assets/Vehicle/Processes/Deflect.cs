@@ -28,19 +28,26 @@ public class Deflect : Process
     //    Tol = 0.5f * Mathf.Deg2Rad;
     //}
 
-    public Deflect(NearStream current, NearStream next)
+    public Deflect(Stream up, Stream down)
     {
-        Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(current.WallNormals()[0], next.FlowDir) / (current.WallNormals()[0].magnitude * next.FlowDir.magnitude));
+        if (up is FreeStream)
+        {
+            Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(up.WallNormals(down)[0], down.FlowDir) / (up.WallNormals(down)[0].magnitude * down.FlowDir.magnitude));
+        }
+        else
+        {
+            Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(up.WallNormals()[0], down.FlowDir) / (up.WallNormals()[0].magnitude * down.FlowDir.magnitude));
+        }
         Tol = 0.5f * Mathf.Deg2Rad;
     }
 
-    public Deflect(FreeStream freeStream, NearStream next)
-    {
-        Vector3 freeNormal = Vector3.Cross(freeStream.FlowDir, Vector3.forward).normalized;
-        Vector3 matchNormal = Vector3.Dot(freeNormal, next.WallNormals()[0]) > 0 ? freeNormal : -freeNormal;
-        Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(matchNormal, next.FlowDir) / (matchNormal.magnitude * next.FlowDir.magnitude));
-        Tol = 0.5f * Mathf.Deg2Rad;
-    }
+    //public Deflect(FreeStream freeStream, NearStream next)
+    //{
+    //    Vector3 freeNormal = Vector3.Cross(freeStream.FlowDir, Vector3.forward).normalized;
+    //    Vector3 matchNormal = Vector3.Dot(freeNormal, next.WallNormals()[0]) > 0 ? freeNormal : -freeNormal;
+    //    Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(matchNormal, next.FlowDir) / (matchNormal.magnitude * next.FlowDir.magnitude));
+    //    Tol = 0.5f * Mathf.Deg2Rad;
+    //}
 
     public override Parcel GetParcel(Parcel i)
     {

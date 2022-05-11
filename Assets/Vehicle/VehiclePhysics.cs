@@ -210,32 +210,44 @@ public class VehiclePhysics : MonoBehaviour
         // Exhaust -> UpperRamp => EXHAUST
         Exhaust UpperExhaust = new(afm.Nozzle, afm.UpperRamp);
         Parcel upperPlume = UpperExhaust.GetParcel(afm.Nozzle.Fluid);
-        AddDrawnMesh(ExhaustMeshes, UpperExhaust.GetExhaustMesh(afm.Nozzle, effectThickness));
+        AddDrawnMesh(ExhaustMeshes, UpperExhaust.GetExhaustMesh(afm.Nozzle));
 
 
         // Exhaust -> NacelleRamp => EXHAUST
         Exhaust NacelleExhaust = new(afm.Nozzle, afm.NacelleRamp);
         Parcel NacellePlume = NacelleExhaust.GetParcel(afm.Nozzle.Fluid);
-        AddDrawnMesh(ExhaustMeshes, NacelleExhaust.GetExhaustMesh(afm.Nozzle, effectThickness));
+        AddDrawnMesh(ExhaustMeshes, NacelleExhaust.GetExhaustMesh(afm.Nozzle));
 
 
         // WING
-        Deflect UpperLeadWingDeflect = new Deflect(freeStream, wng.UpperLead);
-        Deflect LowerLeadWingDeflect = new Deflect(freeStream, wng.LowerLead);
-        Deflect UpperTrailWingDeflect = new Deflect(wng.UpperLead, wng.UpperTrail);
-        Deflect LowerTrailWingDeflect = new Deflect(wng.LowerLead, wng.LowerTrail);
+        Component[] wing = new Component[] { new Ramp(wng.Lower, freeStream, wng.Width), new Ramp(wng.Upper, freeStream, wng.Width) };
+        foreach (Component c in wing)
+        {
+            c.Operate();
+            Force += c.Force * 2f;
+            Moment += c.Moment * 2f;
+        }
+        //Debug.Log((wing[0].Force + wing[1].Force) * 2f + ", " + (wing[0].Moment + wing[1].Moment) * 2f);
 
-        wng.UpperLead.Fluid = UpperLeadWingDeflect.GetParcel(freeStream.Fluid);
-        wng.LowerLead.Fluid = LowerLeadWingDeflect.GetParcel(freeStream.Fluid);
-        wng.UpperTrail.Fluid = UpperTrailWingDeflect.GetParcel(wng.UpperLead.Fluid);
-        wng.LowerTrail.Fluid = LowerTrailWingDeflect.GetParcel(wng.LowerLead.Fluid);
+        //Vector3 fbefore = Force;
+        //float mbefore = Moment;
 
-        PressureForceAndMoment(wng.UpperLead.WallPoints(0.5f)[0], wng.UpperLead.WallNormals()[0], wng.UpperLead.Fluid.P);
-        PressureForceAndMoment(wng.LowerLead.WallPoints(0.5f)[0], wng.LowerLead.WallNormals()[0], wng.LowerLead.Fluid.P);
-        PressureForceAndMoment(wng.UpperTrail.WallPoints(0.5f)[0], wng.UpperTrail.WallNormals()[0], wng.UpperTrail.Fluid.P);
-        PressureForceAndMoment(wng.LowerTrail.WallPoints(0.5f)[0], wng.LowerTrail.WallNormals()[0], wng.LowerTrail.Fluid.P);
+        //Deflect UpperLeadWingDeflect = new Deflect(freeStream, wng.Upper[0]);
+        //Deflect LowerLeadWingDeflect = new Deflect(freeStream, wng.Lower[0]);
+        //Deflect UpperTrailWingDeflect = new Deflect(wng.Upper[0], wng.Upper[1]);
+        //Deflect LowerTrailWingDeflect = new Deflect(wng.Lower[0], wng.Lower[1]);
 
-        AddDrawnMesh(DeflectMeshes, UpperLeadWingDeflect.GetDeflectMesh(wng.UpperLead, effectThickness, _debug));
+        //wng.Upper[0].Fluid = UpperLeadWingDeflect.GetParcel(freeStream.Fluid);
+        //wng.Lower[0].Fluid = LowerLeadWingDeflect.GetParcel(freeStream.Fluid);
+        //wng.Upper[1].Fluid = UpperTrailWingDeflect.GetParcel(wng.Upper[0].Fluid);
+        //wng.Lower[1].Fluid = LowerTrailWingDeflect.GetParcel(wng.Lower[0].Fluid);
+
+        //PressureForceAndMoment(wng.Upper[0].WallPoints(0.5f)[0], wng.Upper[0].WallNormals()[0], wng.Upper[0].Fluid.P);
+        //PressureForceAndMoment(wng.Lower[0].WallPoints(0.5f)[0], wng.Lower[0].WallNormals()[0], wng.Lower[0].Fluid.P);
+        //PressureForceAndMoment(wng.Upper[1].WallPoints(0.5f)[0], wng.Upper[1].WallNormals()[0], wng.Upper[1].Fluid.P);
+        //PressureForceAndMoment(wng.Lower[1].WallPoints(0.5f)[0], wng.Lower[1].WallNormals()[0], wng.Lower[1].Fluid.P);
+
+        //Debug.Log("working: " + (Force - fbefore) + ", " + (Moment - mbefore));
 
 
         // -- Forces --
@@ -261,11 +273,6 @@ public class VehiclePhysics : MonoBehaviour
         //Debug.Log("Upper: " + afm.UpperRamp.Fluid.P);
     }
 
-    void Ramp()
-    {
-
-    }
-
     float LeverArm3(Vector3 point, Vector3 force)
     {
         //moments += Mathf.Abs(Force.magnitude) * LeverArm(Surface.SubPoint, Force);
@@ -279,7 +286,7 @@ public class VehiclePhysics : MonoBehaviour
         Vector3 force = pressure * afm.Width * -vector;
         Force += force;
         Moment += Mathf.Abs(force.magnitude) * LeverArm3(point, force);
-        Debug.Log(force + ", " + LeverArm3(point, force));
+        //Debug.Log(force + ", " + LeverArm3(point, force));
         if (_debug)
         {
             Debug.DrawRay(rb.GetRelativePoint(point), rb.GetRelativeVector(force.normalized));

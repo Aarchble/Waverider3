@@ -9,5 +9,4 @@ public abstract class NearStream : Stream
 
     public abstract Vector3[] WallPoints(float t);
     public abstract Vector3[] WallVectors();
-    public abstract Vector3[] WallNormals();
 }

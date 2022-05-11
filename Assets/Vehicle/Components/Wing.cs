@@ -13,10 +13,8 @@ public class Wing
 
     public Mesh WingMesh;
 
-    public ExternalStream UpperLead;
-    public ExternalStream UpperTrail;
-    public ExternalStream LowerLead;
-    public ExternalStream LowerTrail;
+    public ExternalStream[] Upper;
+    public ExternalStream[] Lower;
 
     public Wing(Vector3 position, float chord, float semiSpan, float thickAngle, float alpha)
     {
@@ -36,9 +34,7 @@ public class Wing
         WingMesh.vertices = wingVert;
         WingMesh.triangles = new int[] { 0, 3, 1, 3, 2, 1 };
 
-        UpperLead = new(wingVert[0], wingVert[1], true);
-        UpperTrail = new(wingVert[1], wingVert[2], true);
-        LowerLead = new(wingVert[0], wingVert[3], false);
-        LowerTrail = new(wingVert[3], wingVert[2], false);
+        Upper = new ExternalStream[] { new ExternalStream(wingVert[0], wingVert[1], true), new ExternalStream(wingVert[1], wingVert[2], true) };
+        Lower = new ExternalStream[] { new ExternalStream(wingVert[0], wingVert[3], false), new ExternalStream(wingVert[3], wingVert[2], false) };
     }
 }

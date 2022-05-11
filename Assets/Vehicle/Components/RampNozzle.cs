@@ -7,18 +7,20 @@ public class RampNozzle : Component
     // Single Expansion Ramp Nozzle (SERN)
 
     // Streams
-    Stream Up;
-    NearStream Current;
-    Stream Down;
+    //Stream[] Up;
+    //NearStream Current;
+    //Stream Down;
 
     // Processes
     Exhaust UpstreamExhaust;
     Exhaust DownstreamExhaust; // After the ExternalStream
     AreaChange Surface;
 
-    public RampNozzle(ExternalStream stream)
+    public RampNozzle(ExternalStream stream, float width)
     {
+        ExhaustMeshes = new();
 
+        Width = width;
     }
 
     public override void Operate()

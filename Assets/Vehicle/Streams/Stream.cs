@@ -6,6 +6,7 @@ public abstract class Stream
 {
     public Vector3 FlowDir { get; set; }
     public Parcel Fluid { get; set; }
+    public abstract Vector3[] WallNormals(Stream matchStream = null);
 
     public float AngleTo(Stream other)
     {

@@ -24,7 +24,7 @@ public class ExternalStream : NearStream
         return new Vector3[1] { Outlet[0] - Inlet[0] };
     }
 
-    public override Vector3[] WallNormals()
+    public override Vector3[] WallNormals(Stream matchStream = null)
     {
         if (Upper)
         {

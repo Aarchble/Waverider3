@@ -10,7 +10,7 @@ public class Exhaust : Expand
     List<Vector3> jetBoundary;
     bool Upper;
 
-    public Exhaust(NearStream nozzle, NearStream ambient)
+    public Exhaust(NearStream nozzle, Stream ambient)
     {
         Exit = ambient.Fluid;
         NozzleAngle = Vector3.Angle(nozzle.FlowDir, nozzle.WallVectors()[0]) * Mathf.Deg2Rad;
@@ -58,8 +58,10 @@ public class Exhaust : Expand
         return final;
     }
 
-    public Mesh[] GetExhaustMesh(NearStream nearStream, float thickness)
+    public Mesh[] GetExhaustMesh(NearStream nearStream)
     {
+        float thickness = 0.01f;
+
         float invert = Upper ? 1f : -1f;
 
         Vector3 outletOrigin = nearStream.Outlet[0] + (nearStream.Outlet[^1] - nearStream.Outlet[0]) * 0.5f;
