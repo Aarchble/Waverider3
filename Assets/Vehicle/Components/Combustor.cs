@@ -4,31 +4,38 @@ using UnityEngine;
 
 public class Combustor : Component
 {
-    // Streams
-    //Stream Up;
-    //NearStream Current;
-    //Stream Down;
-
     // Processes
     Deflect Isolator;
     Combust Injection;
 
-    public Combustor(NearStream stream, Stream inStream, Fuel fuel, float width)
+    //public Combustor(InternalStream stream, Stream inStream, Fuel fuel, float width)
+    //{
+    //    DeflectMeshes = new();
+
+    //    Width = width;
+    //    Up = new Stream[] { inStream };
+    //    Current = new NearStream[] { stream };
+
+    //    Isolator = inStream is NearStream nearIn ? new(nearIn, stream) : new((FreeStream)inStream, stream);
+    //    Injection = new(fuel);
+    //}
+
+    public Combustor(InternalStream stream, Fuel fuel, float width)
     {
         DeflectMeshes = new();
 
         Width = width;
-        Up = new Stream[] { inStream };
         Current = new NearStream[] { stream };
 
-        Isolator = inStream is NearStream nearIn ? new(nearIn, stream) : new((FreeStream)inStream, stream);
         Injection = new(fuel);
     }
 
-    public override void Operate()
+    public override void Operate(Stream inStream)
     {
+        Isolator = inStream is NearStream nearIn ? new(nearIn, Current[0]) : new((FreeStream)inStream, Current[0]);
+
         // InletRamp -> Engine => DEFLECT (SHOCK)
-        Parcel preEngine = Isolator.GetParcel(Up[0].Fluid); // engine fluid pre-combustion
+        Parcel preEngine = Isolator.GetParcel(inStream.Fluid); // engine fluid pre-combustion
         // ! This pressure doesn't act anywhere significant
         AddDrawnMesh(DeflectMeshes, Isolator.GetDeflectMesh(Current[0])); // This will always be a shock, hence only adds one Mesh to list. 
 
@@ -53,5 +60,10 @@ public class Combustor : Component
         // ! Stream Thrust
         float massFlow = Current[0].Fluid.Rho * Current[0].Fluid.V * (Current[0].Inlet[1] - Current[0].Inlet[0]).magnitude * Width;
         StreamForceAndMoment(Vector3.Lerp(Current[0].Inlet[0], Current[0].Inlet[^1], 0.5f), Current[0].FlowDir, (Current[0].Fluid.V - preEngine.V) * massFlow);
+    }
+
+    public override Stream GetOutput(Component down)
+    {
+        return Current[^1];
     }
 }

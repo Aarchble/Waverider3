@@ -6,11 +6,6 @@ public class RampNozzle : Component
 {
     // Single Expansion Ramp Nozzle (SERN)
 
-    // Streams
-    //Stream[] Up;
-    //NearStream Current;
-    //Stream Down;
-
     // Processes
     Exhaust UpstreamExhaust;
     Exhaust DownstreamExhaust; // After the ExternalStream
@@ -23,8 +18,13 @@ public class RampNozzle : Component
         Width = width;
     }
 
-    public override void Operate()
+    public override void Operate(Stream inStream)
     {
         throw new System.NotImplementedException();
+    }
+
+    public override Stream GetOutput(Component down)
+    {
+        return Current[^1];
     }
 }

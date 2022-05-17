@@ -16,6 +16,6 @@ public abstract class Stream
     public float AngleToPoint(Vector3 pt0, Vector3 pt1)
     {
         Vector3 temp = pt1 - pt0;
-        return Vector3.SignedAngle(FlowDir, temp, new Vector3(0f, 0f, 1f)) * Mathf.Deg2Rad;
+        return Vector3.SignedAngle(FlowDir, temp, new Vector3(0f, 0f, 1f)) * Mathf.Deg2Rad; // Should this be signed?
     }
 }

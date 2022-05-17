@@ -31,12 +31,12 @@ public class Airframe
 
     // -- Outputs --
     // External Flows
-    public NearStream InletRamp;
-    public NearStream UpperRamp;
-    public NearStream NacelleRamp;
+    public ExternalStream[] InletRamp;
+    public ExternalStream[] UpperRamp;
+    public ExternalStream[] NacelleRamp;
     // Internal Flows
-    public NearStream Engine;
-    public NearStream Nozzle;
+    public InternalStream Engine;
+    public InternalStream Nozzle;
 
     public Airframe()
     {
@@ -123,9 +123,9 @@ public class Airframe
 
         // -- Build Streams --
         // External Flows
-        InletRamp = new ExternalStream(fuselage[0], fuselage[1], false);
-        UpperRamp = new ExternalStream(fuselage[0], fuselage[^2], true);
-        NacelleRamp = new ExternalStream(nacelle[0], nacelle[^2], false);
+        InletRamp = new ExternalStream[] { new ExternalStream(fuselage[0], fuselage[1], false) };
+        UpperRamp = new ExternalStream[] { new ExternalStream(fuselage[0], fuselage[^2], true) };
+        NacelleRamp = new ExternalStream[] { new ExternalStream(nacelle[0], nacelle[^2], false) };
         // Internal Flows
         Engine = new InternalStream(new Vector3[] { fuselage[1], nacelle[0] }, new Vector3[] { fuselage[2], nacelle[1] });
         Nozzle = new InternalStream(new Vector3[] { fuselage[2], nacelle[1] }, new Vector3[] { fuselage[3], nacelle[2] });

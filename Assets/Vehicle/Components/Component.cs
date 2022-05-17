@@ -5,9 +5,9 @@ using UnityEngine;
 public abstract class Component
 {
     // Streams
-    public Stream[] Up;
+    //public Stream[] Up;
     public NearStream[] Current;
-    public Stream[] Down;
+    //public Stream[] Down;
 
     // Properties
     public Vector3 Force;
@@ -16,8 +16,8 @@ public abstract class Component
     public List<Mesh> DeflectMeshes;
     public List<Mesh> ExhaustMeshes;
 
-    public abstract void Operate();
-    //public abstract void GetOutput();
+    public abstract void Operate(Stream inStream);
+    public abstract Stream GetOutput(Component down);
     //public abstract void GetInput();
 
     float LeverArm3(Vector3 point, Vector3 force)
