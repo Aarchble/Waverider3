@@ -2,12 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Component
+public abstract class Processor
 {
     // Streams
-    //public Stream[] Up;
     public NearStream[] Current;
-    //public Stream[] Down;
 
     // Properties
     public Vector3 Force;
@@ -16,9 +14,10 @@ public abstract class Component
     public List<Mesh> DeflectMeshes;
     public List<Mesh> ExhaustMeshes;
 
+    public bool operated;
+
     public abstract void Operate(Stream inStream);
-    public abstract Stream GetOutput(Component down);
-    //public abstract void GetInput();
+    public abstract Stream GetOutput(Processor down);
 
     float LeverArm3(Vector3 point, Vector3 force)
     {

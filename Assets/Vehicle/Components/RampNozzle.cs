@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RampNozzle : Component
+public class RampNozzle : Processor
 {
     // Single Expansion Ramp Nozzle (SERN)
 
@@ -13,6 +13,7 @@ public class RampNozzle : Component
 
     public RampNozzle(ExternalStream stream, float width)
     {
+        operated = false;
         ExhaustMeshes = new();
 
         Width = width;
@@ -20,10 +21,11 @@ public class RampNozzle : Component
 
     public override void Operate(Stream inStream)
     {
+        operated = true;
         throw new System.NotImplementedException();
     }
 
-    public override Stream GetOutput(Component down)
+    public override Stream GetOutput(Processor down)
     {
         return Current[^1];
     }

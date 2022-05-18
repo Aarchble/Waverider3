@@ -2,27 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Combustor : Component
+public class Combustor : Processor
 {
     // Processes
     Deflect Isolator;
     Combust Injection;
 
-    //public Combustor(InternalStream stream, Stream inStream, Fuel fuel, float width)
-    //{
-    //    DeflectMeshes = new();
-
-    //    Width = width;
-    //    Up = new Stream[] { inStream };
-    //    Current = new NearStream[] { stream };
-
-    //    Isolator = inStream is NearStream nearIn ? new(nearIn, stream) : new((FreeStream)inStream, stream);
-    //    Injection = new(fuel);
-    //}
-
-    public Combustor(InternalStream stream, Fuel fuel, float width)
+    public Combustor(InternalStream stream, Fuel fuel, float width, List<Mesh> deflectMeshes)
     {
-        DeflectMeshes = new();
+        operated = false;
+        DeflectMeshes = deflectMeshes;
 
         Width = width;
         Current = new NearStream[] { stream };
@@ -32,8 +21,7 @@ public class Combustor : Component
 
     public override void Operate(Stream inStream)
     {
-        Isolator = inStream is NearStream nearIn ? new(nearIn, Current[0]) : new((FreeStream)inStream, Current[0]);
-
+        Isolator = new(inStream, Current[0]);
         // InletRamp -> Engine => DEFLECT (SHOCK)
         Parcel preEngine = Isolator.GetParcel(inStream.Fluid); // engine fluid pre-combustion
         // ! This pressure doesn't act anywhere significant
@@ -60,9 +48,11 @@ public class Combustor : Component
         // ! Stream Thrust
         float massFlow = Current[0].Fluid.Rho * Current[0].Fluid.V * (Current[0].Inlet[1] - Current[0].Inlet[0]).magnitude * Width;
         StreamForceAndMoment(Vector3.Lerp(Current[0].Inlet[0], Current[0].Inlet[^1], 0.5f), Current[0].FlowDir, (Current[0].Fluid.V - preEngine.V) * massFlow);
+
+        operated = true;
     }
 
-    public override Stream GetOutput(Component down)
+    public override Stream GetOutput(Processor down)
     {
         return Current[^1];
     }

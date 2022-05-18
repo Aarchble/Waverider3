@@ -161,7 +161,7 @@ MonoBehaviour:
   effectLength: 1
   effectThickness: 0.01
   paused: 0
-  Speed: 2484
+  Speed: 2479
   AoA: 0
 --- !u!50 &108080719
 Rigidbody2D:

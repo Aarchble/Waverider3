@@ -21,6 +21,7 @@ public class Deflect : Process
             Theta = Mathf.PI / 2f - Mathf.Acos(Vector3.Dot(up.WallNormals()[0], down.FlowDir) / (up.WallNormals()[0].magnitude * down.FlowDir.magnitude));
         }
         Tol = 0.5f * Mathf.Deg2Rad;
+        InternalFlow = down is InternalStream;
     }
 
     public override Parcel GetParcel(Parcel i)
@@ -67,7 +68,7 @@ public class Deflect : Process
         float thickness = 0.01f;
 
         // NO MASK
-        if (Theta > Tol)
+        if (Theta > Tol || InternalFlow)
         {
             // Shock
             Vector3 wave = nearStream.FlowDir + nearStream.WallNormals()[0] * nearStream.FlowDir.magnitude * Mathf.Tan(Angles[0]);

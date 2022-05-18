@@ -2,16 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Nozzle : Component
+public class Nozzle : Processor
 {
     // Processes
     AreaChange Surface;
     Exhaust UpperExhaust;
     Exhaust LowerExhaust;
 
-    public Nozzle(InternalStream stream, Stream outUpper, Stream outLower, float width)
+    public Nozzle(InternalStream stream, Stream outUpper, Stream outLower, float width, List<Mesh> exhaustMeshes)
     {
-        ExhaustMeshes = new();
+        operated = false;
+        ExhaustMeshes = exhaustMeshes;
 
         Width = width;
         Current = new NearStream[] { stream };
@@ -42,9 +43,11 @@ public class Nozzle : Component
         // Exhaust -> NacelleRamp => EXHAUST
         Parcel lowerPlume = LowerExhaust.GetParcel(Current[0].Fluid);
         AddDrawnMesh(ExhaustMeshes, LowerExhaust.GetExhaustMesh(Current[0]));
+
+        operated = true;
     }
 
-    public override Stream GetOutput(Component down)
+    public override Stream GetOutput(Processor down)
     {
         return Current[^1];
     }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ramp : Component
+public class Ramp : Processor
 {
     // Streams
     Stream Up;
@@ -10,10 +10,10 @@ public class Ramp : Component
     // Processes
     Deflect[] Surfaces;
 
-    public Ramp(ExternalStream[] streams, float width)
+    public Ramp(ExternalStream[] streams, float width, List<Mesh> deflectMeshes)
     {
-        DeflectMeshes = new();
-        ExhaustMeshes = new();
+        operated = false;
+        DeflectMeshes = deflectMeshes;
 
         Width = width;
         Current = streams;
@@ -38,28 +38,28 @@ public class Ramp : Component
             PressureForceAndMoment(Current[i].WallPoints(0.5f)[0], Current[i].WallNormals()[0], Current[i].Fluid.P);
             AddDrawnMesh(DeflectMeshes, Surfaces[i].GetDeflectMesh(Current[i]));
         }
+
+        operated = true;
     }
 
-    public override Stream GetOutput(Component down)
+    public override Stream GetOutput(Processor down)
     {
-        //Stream outStream = Up;
+        Stream outStream = Up;
 
-        //for (int i = 0; i < Current.Length; i++)
-        //{
-        //    Debug.Log("Shock Angle" + Surfaces[i].GetAngles()[^1] * Mathf.Rad2Deg + ", Angle to Point: " + Current[0].AngleToPoint(Current[0].Inlet[0], down.Current[0].Inlet[^1]) * Mathf.Rad2Deg);
-        //    // Down is ExternalStream:
-        //    if (Surfaces[i].GetAngles()[^1] > Current[0].AngleToPoint(Current[0].Inlet[0], down.Current[0].Inlet[^1]))
-        //    {
-        //        // Included
-        //        outStream = Current[i];
-        //    }
-        //    else
-        //    {
-        //        // Not included
-        //    }
-        //}
+        for (int i = 0; i < Current.Length; i++)
+        {
+            // Down is ExternalStream:
+            if (Surfaces[i].GetAngles()[^1] > Current[i].AngleToPoint(Current[i].Inlet[0], down.Current[0].Inlet[0]))
+            {
+                // Included
+                outStream = Current[i];
+            }
+            else
+            {
+                // Not included
+            }
+        }
 
-        //return outStream;
-        return Current[^1];
+        return outStream;
     }
 }
