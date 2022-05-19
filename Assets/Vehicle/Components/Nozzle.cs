@@ -9,10 +9,10 @@ public class Nozzle : Processor
     Exhaust UpperExhaust;
     Exhaust LowerExhaust;
 
-    public Nozzle(InternalStream stream, Stream outUpper, Stream outLower, float width, List<Mesh> exhaustMeshes)
+    public Nozzle(InternalStream stream, Stream outUpper, Stream outLower, float width, List<Mesh> exhaustMeshes = null)
     {
         operated = false;
-        ExhaustMeshes = exhaustMeshes;
+        ExhaustMeshes = exhaustMeshes == null ? new() : exhaustMeshes;
 
         Width = width;
         Current = new NearStream[] { stream };

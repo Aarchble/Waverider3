@@ -25,9 +25,6 @@ public class VehiclePhysics : MonoBehaviour
     public float effectLength;
     public float effectThickness;
 
-    public bool paused;
-    private bool wasPaused;
-
     // -- DEBUG PARAMS --
     bool _debug;
     [Range(1000f, 4000f)]
@@ -39,7 +36,7 @@ public class VehiclePhysics : MonoBehaviour
     void Start()
     {
         afm = new();
-        wng = new(new Vector3(-2.5f, 0.1f), afm.Length / 2f, 0.5f * afm.Width, 3f, 5f);
+        wng = new(new Vector3(-2.5f, 0.0f), afm.Length / 2f, 0.5f * afm.Width, 3f, 0f);
         rb = GetComponent<Rigidbody2D>();
         fcs = GetComponent<FlightControls>();
         ful = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
@@ -48,9 +45,8 @@ public class VehiclePhysics : MonoBehaviour
         float height = Mathf.Abs(afm.Nozzle.Outlet[^1].y) + Mathf.Abs(afm.Nozzle.Outlet[0].y); // -- verified --
         rb.inertia = 1f / 12f * rb.mass * (afm.Length * afm.Length + height * height);
 
-        paused = false;
-        wasPaused = true;
         Velocity = new Vector3(Speed, 0f, 0f);
+        rb.velocity = rb.GetRelativeVector(Velocity);
 
         _debug = true;
     }
@@ -91,25 +87,8 @@ public class VehiclePhysics : MonoBehaviour
     void FixedUpdate()
     {
         Debug.Log("-- Fixed Update Start --");
-        if (paused && !wasPaused)
-        {
-            // Stop
-            wasPaused = true;
-            Velocity = rb.GetVector(rb.velocity);
-            rb.velocity = Vector2.zero;
-            rb.gravityScale = 0f;
-        }
-        else if (!paused && wasPaused)
-        {
-            // Restart
-            wasPaused = false;
-            rb.velocity = rb.GetRelativeVector(Velocity);
-            rb.gravityScale = 1f;
-        }
-        else if (!paused && !wasPaused)
-        {
-            Velocity = rb.GetVector(rb.velocity);
-        }
+        Velocity = rb.GetVector(rb.velocity);
+
         // Need to use the following equation to keep calculating velocity while paused
         //Vector3 velocity = new(Velocity * Mathf.Cos(-AoA * Mathf.Deg2Rad), Velocity * Mathf.Sin(-AoA * Mathf.Deg2Rad), 0f);
 
@@ -164,7 +143,7 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // WING
-        Processor[] wing = new Processor[] { new Ramp(wng.Lower, wng.Width, Dmesh), new Ramp(wng.Upper, wng.Width, Dmesh) };
+        Processor[] wing = new Processor[] { new Ramp(wng.Lower, wng.Width), new Ramp(wng.Upper, wng.Width) };
         foreach (Processor c in wing)
         {
             c.Operate(freeStream);
@@ -174,13 +153,10 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // -- Forces --
-        if (!paused)
-        {
-            //Debug.Log("Force: " + Force);
-            //Debug.Log("Moment: " + Moment);
-            rb.AddRelativeForce(Force);
-            rb.AddTorque(Moment);
-        }
+        Debug.Log("Force: " + Force);
+        Debug.Log("Moment: " + Moment);
+        rb.AddRelativeForce(Force);
+        rb.AddTorque(Moment);
 
         //rb.rotation = fcs.PitchInceptor;
 

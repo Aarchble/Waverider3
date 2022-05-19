@@ -8,10 +8,10 @@ public class Combustor : Processor
     Deflect Isolator;
     Combust Injection;
 
-    public Combustor(InternalStream stream, Fuel fuel, float width, List<Mesh> deflectMeshes)
+    public Combustor(InternalStream stream, Fuel fuel, float width, List<Mesh> deflectMeshes = null)
     {
         operated = false;
-        DeflectMeshes = deflectMeshes;
+        DeflectMeshes = deflectMeshes == null ? new() : deflectMeshes;
 
         Width = width;
         Current = new NearStream[] { stream };

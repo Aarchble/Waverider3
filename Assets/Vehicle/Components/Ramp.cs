@@ -10,10 +10,10 @@ public class Ramp : Processor
     // Processes
     Deflect[] Surfaces;
 
-    public Ramp(ExternalStream[] streams, float width, List<Mesh> deflectMeshes)
+    public Ramp(ExternalStream[] streams, float width, List<Mesh> deflectMeshes = null)
     {
         operated = false;
-        DeflectMeshes = deflectMeshes;
+        DeflectMeshes = deflectMeshes == null ? new() : deflectMeshes;
 
         Width = width;
         Current = streams;
