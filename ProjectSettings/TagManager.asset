@@ -6,6 +6,7 @@ TagManager:
   tags:
   - movingXY
   - movingY
+  - BuildPoint
   layers:
   - Default
   - TransparentFX

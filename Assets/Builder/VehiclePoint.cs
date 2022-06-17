@@ -2,19 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class VehiclePoint : MonoBehaviour
 {
-    public bool gridSnap = false;
-    public float scale = 10f;
+    //public bool gridSnap = false;
     public List<NearStream> ConnectedStreams;
 
-    void Update()
+    public GameObject[] UpstreamPoint;
+    public GameObject[] DownstreamPoint;
+
+    // Internal streams
+    public GameObject PartnerPoint; // Build internal stream based on Upstream/Downstream PartnerPoint ALSO not null
+
+    Vector3 ClickOffset;
+    Camera Cam;
+
+    private void Awake()
     {
-        if (transform.hasChanged == true)
+        Cam = Camera.main;
+    }
+
+    private void OnMouseDown()
+    {
+        ClickOffset = transform.position - GetMousePos();
+    }
+
+    private void OnMouseDrag()
+    {
+        transform.position = (Vector3)Vector3Int.RoundToInt((GetMousePos() + ClickOffset) * VehicleBuilder.Instance.scale) / VehicleBuilder.Instance.scale;
+    }
+
+    Vector3 GetMousePos()
+    {
+        Vector3 mousePos = Cam.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = 0f;
+        return mousePos;
+    }
+
+    public GameObject Next(int streamLineIndex)
+    {
+        if (DownstreamPoint != null)
         {
-            transform.hasChanged = false;
-            transform.position = (Vector3)Vector3Int.RoundToInt(transform.position * scale) / scale;
+            if (DownstreamPoint.Length > 1)
+            {
+                return DownstreamPoint[streamLineIndex];
+            }
+            else
+            {
+                return DownstreamPoint[0];
+            }
+        }
+        else
+        {
+            return null;
         }
     }
+
 }

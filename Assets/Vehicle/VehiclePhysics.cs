@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class VehiclePhysics : MonoBehaviour
 {
+    public static VehiclePhysics Instance;
     public Material structMat;
     public Material internalsMat;
     public Material wingMat;
@@ -31,6 +32,11 @@ public class VehiclePhysics : MonoBehaviour
     public float Speed;
     [Range(-90f, 90f)]
     public float AoA;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -165,51 +171,6 @@ public class VehiclePhysics : MonoBehaviour
         //Debug.Log("Nozzle: " + afm.Nozzle.Fluid.P);
         //Debug.Log("Nacelle: " + afm.NacelleRamp.Fluid.P);
         //Debug.Log("Upper: " + afm.UpperRamp.Fluid.P);
-    }
-
-    float LeverArm3(Vector3 point, Vector3 force)
-    {
-        //moments += Mathf.Abs(Force.magnitude) * LeverArm(Surface.SubPoint, Force);
-        return Vector3.Dot(point, Vector3.Cross(force, Vector3.forward).normalized); //seems right
-    }
-
-    void PressureForceAndMoment(Vector3 point, Vector3 vector, float pressure)
-    {
-        //point: afm.NacelleRamp.WallPoints(0.5f)[0]
-        //force: +/-afm.NacelleRamp.WallVectors()[0]
-        Vector3 force = pressure * afm.Width * -vector;
-        Force += force;
-        Moment += Mathf.Abs(force.magnitude) * LeverArm3(point, force);
-        //Debug.Log(force + ", " + LeverArm3(point, force));
-        if (_debug)
-        {
-            Debug.DrawRay(rb.GetRelativePoint(point), rb.GetRelativeVector(force.normalized));
-        }
-    }
-
-    void StreamForceAndMoment(Vector3 point, Vector3 vector, float thrust)
-    {
-        Vector3 force = thrust * -vector;
-        Force += force;
-        Moment += Mathf.Abs(force.magnitude) * LeverArm3(point, force);
-        if (_debug)
-        {
-            Debug.DrawRay(rb.GetRelativePoint(point), rb.GetRelativeVector(force.normalized));
-        }
-    }
-
-    Vector2 TUV(float temperature)
-    {
-        // Edge Temperature UV
-        return new Vector2(temperature, 1f);
-    }
-
-    void AddDrawnMesh(List<Mesh> drawnMeshes, Mesh[] meshes)
-    {
-        if (meshes != null)
-        {
-            drawnMeshes.AddRange(meshes);
-        }
     }
 
 }
