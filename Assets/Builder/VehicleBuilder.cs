@@ -29,12 +29,22 @@ public class VehicleBuilder : MonoBehaviour//, IPointerDownHandler
         foreach (GameObject pt in LeadingPoints)
         {
             VehiclePoint vpt = pt.GetComponent<VehiclePoint>();
-            int streamlineCount = vpt.DownstreamPoint.Length - (vpt.PartnerPoint != null ? 1 : 0);
+            int streamlineCount = vpt.DownstreamPoint.Length - (vpt.PartnerPoint != null ? 1 : 0); // This is always 2 or 1, except when Next() == null where it is 0
             for (int streamlineIndex = 0; streamlineIndex < streamlineCount; streamlineIndex++)
             {
                 while (vpt.Next(streamlineIndex) != null)
                 {
-
+                    VehiclePoint nxtvpt = vpt.Next(streamlineIndex).GetComponent<VehiclePoint>();
+                    if (vpt.PartnerPoint != null && nxtvpt.PartnerPoint != null)
+                    {
+                        // Internal Flows
+                        //Engine = new InternalStream(new Vector3[] { vpt.transform.localPosition, vpt.PartnerPoint.transform.localPosition }, new Vector3[] { nxtvpt.transform.localPosition, nxtvpt.PartnerPoint.transform.localPosition });
+                    }
+                    else
+                    {
+                        // External Flows
+                        //NacelleRamp = new ExternalStream[] { new ExternalStream(vpt.transform.localPosition, vpt.PartnerPoint.transform.localPosition, false) }; // need to set upper bool properly
+                    }
                 }
             }
         }
