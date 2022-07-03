@@ -8,8 +8,10 @@ public class Combustor : Processor
     Deflect Isolator;
     Combust Injection;
 
-    public Combustor(InternalStream stream, Fuel fuel, float width, List<Mesh> deflectMeshes = null)
+    public Combustor(GameObject[] points, Fuel fuel, float width, List<Mesh> deflectMeshes = null)
     {
+        InternalStream stream = new(new Vector3[] { points[0].transform.localPosition, points[1].transform.localPosition }, new Vector3[] { points[2].transform.localPosition, points[3].transform.localPosition });
+
         operated = false;
         DeflectMeshes = deflectMeshes == null ? new() : deflectMeshes;
 

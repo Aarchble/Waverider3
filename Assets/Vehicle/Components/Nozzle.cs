@@ -9,8 +9,10 @@ public class Nozzle : Processor
     Exhaust UpperExhaust;
     Exhaust LowerExhaust;
 
-    public Nozzle(InternalStream stream, Stream outUpper, Stream outLower, float width, List<Mesh> exhaustMeshes = null)
+    public Nozzle(GameObject[] points, Stream outUpper, Stream outLower, float width, List<Mesh> exhaustMeshes = null)
     {
+        InternalStream stream = new(new Vector3[] { points[0].transform.localPosition, points[1].transform.localPosition }, new Vector3[] { points[2].transform.localPosition, points[3].transform.localPosition });
+
         operated = false;
         ExhaustMeshes = exhaustMeshes == null ? new() : exhaustMeshes;
 
