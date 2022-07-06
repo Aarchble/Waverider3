@@ -10,7 +10,7 @@ public class Ramp : Processor
     // Processes
     Deflect[] Surfaces;
 
-    public Ramp(GameObject[] points, bool upper, float width, List<Mesh> deflectMeshes = null)
+    public Ramp(GameObject[] points, bool upper, float width)
     {
         ExternalStream[] streams = new ExternalStream[points.Length - 1];
 
@@ -20,7 +20,7 @@ public class Ramp : Processor
         }
 
         operated = false;
-        DeflectMeshes = deflectMeshes == null ? new() : deflectMeshes;
+        DeflectMeshes = VehiclePhysics.Instance.Dmesh;
 
         Width = width;
         Current = streams;

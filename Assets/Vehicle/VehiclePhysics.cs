@@ -20,8 +20,8 @@ public class VehiclePhysics : MonoBehaviour
     float Moment;
     Vector3 Velocity;
 
-    List<Mesh> Dmesh;
-    List<Mesh> Emesh;
+    public List<Mesh> Dmesh;
+    public List<Mesh> Emesh;
 
     public float effectLength;
     public float effectThickness;
