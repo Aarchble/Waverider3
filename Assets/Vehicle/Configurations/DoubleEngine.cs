@@ -5,16 +5,22 @@ using UnityEngine;
 public class DoubleEngine : VehicleStatic
 {
     // Upper Points
-    GameObject[] UpperRampPoints;
-    GameObject[] UpperEnginePoints;
-    GameObject[] UpperNozzlePoints;
-    GameObject[] UpperNacelleRampPoints;
+    public GameObject[] UpperRampPoints;
+    public GameObject[] UpperEnginePoints;
+    public GameObject[] UpperNozzlePoints;
+    public GameObject[] UpperNacelleRampPoints;
 
     // Lower Points
-    GameObject[] LowerRampPoints;
-    GameObject[] LowerEnginePoints;
-    GameObject[] LowerNozzlePoints;
-    GameObject[] LowerNacelleRampPoints;
+    public GameObject[] LowerRampPoints;
+    public GameObject[] LowerEnginePoints;
+    public GameObject[] LowerNozzlePoints;
+    public GameObject[] LowerNacelleRampPoints;
+
+    // Meshes
+    Mesh fuselage;
+    Mesh upperNacelle;
+    Mesh lowerNacelle;
+
 
     public override void BuildFlowLines()
     {
@@ -23,9 +29,21 @@ public class DoubleEngine : VehicleStatic
         Processor[] lowerFlowLine = new Processor[] { new Ramp(LowerRampPoints, false, Width), new Ramp(LowerNacelleRampPoints, false, Width) };
 
         // Internal Flows
-        Processor[] upperEngineFlowLine = new Processor[] { upperFlowLine[0], new Combustor(UpperEnginePoints, ful, Width), new Nozzle(UpperNozzlePoints, lowerFlowLine[0].Current[^1], upperFlowLine[1].Current[^1], Width) };
-        Processor[] lowerEngineFlowLine = new Processor[] { lowerFlowLine[0], new Combustor(LowerEnginePoints, ful, Width), new Nozzle(LowerNozzlePoints, upperFlowLine[0].Current[^1], lowerFlowLine[1].Current[^1], Width) };
+        Processor[] upperEngineFlowLine = new Processor[] { upperFlowLine[0], new Combustor(UpperEnginePoints, fuel, Width), new Nozzle(UpperNozzlePoints, lowerFlowLine[0].Current[^1], upperFlowLine[1].Current[^1], Width) };
+        Processor[] lowerEngineFlowLine = new Processor[] { lowerFlowLine[0], new Combustor(LowerEnginePoints, fuel, Width), new Nozzle(LowerNozzlePoints, upperFlowLine[0].Current[^1], lowerFlowLine[1].Current[^1], Width) };
 
         FlowLines = new Processor[][] { upperFlowLine, upperEngineFlowLine, lowerFlowLine, lowerEngineFlowLine };
+    }
+
+    public override Mesh[] BuildMeshes()
+    {
+        Vector3[] fuselageVertices = new Vector3[LowerRampPoints.Length + UpperRampPoints.Length + 2]; // +2 for upperengine +2 for lowerengine -2 for upper points overlap
+        Vector3[] upperNacelleVertices = new Vector3[UpperNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
+        Vector3[] lowerNacelleVertices = new Vector3[LowerNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
+    }
+
+    public override Mesh[] GetMeshes()
+    {
+        return new Mesh[] { fuselage, upperNacelle, lowerNacelle };
     }
 }

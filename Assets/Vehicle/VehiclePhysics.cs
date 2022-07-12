@@ -10,10 +10,9 @@ public class VehiclePhysics : MonoBehaviour
     public Material wingMat;
     public Material shockMat;
 
-    Airframe afm;
+    VehicleStatic veh;
     Wing wng;
     Rigidbody2D rb;
-    FlightControls fcs;
     Fuel ful;
 
     Vector3 Force;
@@ -41,15 +40,13 @@ public class VehiclePhysics : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        afm = new();
-        wng = new(new Vector3(-2.5f, 0.0f), afm.Length / 2f, 0.5f * afm.Width, 3f, 0f);
+        veh = GetComponent<VehicleStatic>();
+        wng = new(new Vector3(-2.5f, 0.0f), veh.Length / 2f, 0.5f * veh.Width, 3f, 0f);
         rb = GetComponent<Rigidbody2D>();
-        fcs = GetComponent<FlightControls>();
         ful = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
 
         // ! Set up dynamic params
-        float height = Mathf.Abs(afm.Nozzle.Outlet[^1].y) + Mathf.Abs(afm.Nozzle.Outlet[0].y); // -- verified --
-        rb.inertia = 1f / 12f * rb.mass * (afm.Length * afm.Length + height * height);
+        rb.inertia = 1f / 12f * rb.mass * (veh.Length * veh.Length + veh.Height * veh.Height);
 
         Velocity = new Vector3(Speed, 0f, 0f);
         rb.velocity = rb.GetRelativeVector(Velocity);
@@ -61,13 +58,11 @@ public class VehiclePhysics : MonoBehaviour
     {
         // -- Vehicle --
         // Structure
-        Graphics.DrawMesh(afm.InternalsMesh, transform.position, transform.rotation, internalsMat, 0);
-        Graphics.DrawMesh(afm.FuselageMesh, transform.position, transform.rotation, structMat, 0);
-        Graphics.DrawMesh(afm.NacelleMesh, transform.position, transform.rotation, structMat, 0);
-        Graphics.DrawMesh(wng.WingMesh, transform.position, transform.rotation, wingMat, 0);
-
-        // Heating
-
+        foreach (Mesh structure in veh.GetMeshes())
+        {
+            Graphics.DrawMesh(structure, transform.position, transform.rotation, structMat, 0);
+        }
+        //Graphics.DrawMesh(wng.WingMesh, transform.position, transform.rotation, wingMat, 0);
 
 
         // -- Flow Effects --
@@ -115,15 +110,7 @@ public class VehiclePhysics : MonoBehaviour
         //Debug.Log("Inlet Deflect Angle " + freeStream.AngleTo(afm.InletRamp));
 
         // -- Flow Streams --
-
-        Processor[] upperFlowLine = new Processor[] { new Ramp(afm.UpperRamp, afm.Width, Dmesh)};
-        Processor[] lowerFlowLine = new Processor[] { new Ramp(afm.InletRamp, afm.Width, Dmesh), new Ramp(afm.NacelleRamp, afm.Width, Dmesh) };
-        Processor[] engineFlowLine = new Processor[] { lowerFlowLine[0], new Combustor(afm.Engine, ful, afm.Width, Dmesh), new Nozzle(afm.Nozzle, afm.UpperRamp[^1], afm.NacelleRamp[^1], afm.Width, Emesh)};
-
-
-        // FUSELAGE
-        Processor[][] flowLines = new Processor[][] { upperFlowLine, lowerFlowLine, engineFlowLine };
-        foreach (Processor[] line in flowLines)
+        foreach (Processor[] line in veh.FlowLines)
         {
             for (int c = 0; c < line.Length; c++)
             {
@@ -149,13 +136,13 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // WING
-        Processor[] wing = new Processor[] { new Ramp(wng.Lower, wng.Width), new Ramp(wng.Upper, wng.Width) };
-        foreach (Processor c in wing)
-        {
-            c.Operate(freeStream);
-            Force += c.Force * 2f;
-            Moment += c.Moment * 2f;
-        }
+        //Processor[] wing = new Processor[] { new Ramp(wng.Lower, wng.Width), new Ramp(wng.Upper, wng.Width) };
+        //foreach (Processor c in wing)
+        //{
+        //    c.Operate(freeStream);
+        //    Force += c.Force * 2f;
+        //    Moment += c.Moment * 2f;
+        //}
 
 
         // -- Forces --

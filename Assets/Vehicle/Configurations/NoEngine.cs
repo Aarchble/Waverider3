@@ -5,10 +5,14 @@ using UnityEngine;
 public class NoEngine : VehicleStatic
 {
     // Upper Points
-    GameObject[] UpperRampPoints;
+    public GameObject[] UpperRampPoints;
 
     // Lower Points
-    GameObject[] LowerRampPoints;
+    public GameObject[] LowerRampPoints;
+
+    //Meshes
+    Mesh fuselage;
+
 
     public override void BuildFlowLines()
     {
@@ -16,5 +20,15 @@ public class NoEngine : VehicleStatic
         Processor[] lowerFlowLine = new Processor[] { new Ramp(LowerRampPoints, false, Width) };
         
         FlowLines = new Processor[][] { upperFlowLine, lowerFlowLine };
+    }
+
+    public override Mesh[] BuildMeshes()
+    {
+        Vector3[] fuselageVertices = new Vector3[LowerRampPoints.Length + UpperRampPoints.Length - 2]; // -2 for upper points overlap
+    }
+
+    public override Mesh[] GetMeshes()
+    {
+        return new Mesh[] { fuselage };
     }
 }
