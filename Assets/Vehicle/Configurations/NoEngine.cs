@@ -22,7 +22,7 @@ public class NoEngine : VehicleStatic
         FlowLines = new Processor[][] { upperFlowLine, lowerFlowLine };
     }
 
-    public override Mesh[] BuildMeshes()
+    public override void BuildMeshes()
     {
         Vector3[] fuselageVertices = new Vector3[LowerRampPoints.Length + UpperRampPoints.Length - 2]; // -2 for upper points overlap
     }

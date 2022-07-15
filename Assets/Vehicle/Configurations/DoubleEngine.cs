@@ -35,7 +35,35 @@ public class DoubleEngine : VehicleStatic
         FlowLines = new Processor[][] { upperFlowLine, upperEngineFlowLine, lowerFlowLine, lowerEngineFlowLine };
     }
 
-    public override Mesh[] BuildMeshes()
+    public override void CentrePoints()
+    {
+        // Fuselage
+        Vector3 upperFuselageCentroid = TriangleCentroid(UpperRampPoints[0].transform.localPosition, UpperNozzlePoints[2].transform.localPosition, UpperEnginePoints[2].transform.localPosition);
+        float upperFuselageArea = TriangleArea(UpperRampPoints[0].transform.localPosition, UpperNozzlePoints[2].transform.localPosition, UpperEnginePoints[2].transform.localPosition);
+
+        Vector3 lowerFuselageCentroid = TriangleCentroid(LowerRampPoints[0].transform.localPosition, LowerNozzlePoints[2].transform.localPosition, LowerEnginePoints[2].transform.localPosition);
+        float lowerFuselageArea = TriangleArea(LowerRampPoints[0].transform.localPosition, LowerNozzlePoints[2].transform.localPosition, LowerEnginePoints[2].transform.localPosition);
+
+        float fuselageArea = upperFuselageArea + lowerFuselageArea;
+        Vector3 fuselageCentroid = (upperFuselageCentroid * upperFuselageArea + lowerFuselageCentroid * lowerFuselageArea) / fuselageArea;
+
+
+        // Nacelle
+        Vector3 upperNacelleCentroid = TriangleCentroid(UpperNacelleRampPoints[0].transform.localPosition, UpperNacelleRampPoints[^1].transform.localPosition, UpperEnginePoints[3].transform.localPosition);
+        float upperNacelleArea = TriangleArea(UpperNacelleRampPoints[0].transform.localPosition, UpperNacelleRampPoints[^1].transform.localPosition, UpperEnginePoints[3].transform.localPosition);
+
+        Vector3 lowerNacelleCentroid = TriangleCentroid(LowerNacelleRampPoints[0].transform.localPosition, LowerNacelleRampPoints[^1].transform.localPosition, LowerEnginePoints[3].transform.localPosition);
+        float lowerNacelleArea = TriangleArea(LowerNacelleRampPoints[0].transform.localPosition, LowerNacelleRampPoints[^1].transform.localPosition, LowerEnginePoints[3].transform.localPosition);
+
+        float nacelleArea = upperNacelleArea + lowerNacelleArea;
+        Vector3 nacelleCentroid = (upperNacelleCentroid * upperNacelleArea + lowerNacelleCentroid * lowerNacelleArea) / nacelleArea;
+
+
+        // Combined
+        Centroid = (fuselageCentroid * fuselageArea + nacelleCentroid * nacelleArea) / (fuselageArea + nacelleArea);
+    }
+
+    public override void BuildMeshes()
     {
         Vector3[] fuselageVertices = new Vector3[LowerRampPoints.Length + UpperRampPoints.Length + 2]; // +2 for upperengine +2 for lowerengine -2 for upper points overlap
         Vector3[] upperNacelleVertices = new Vector3[UpperNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
