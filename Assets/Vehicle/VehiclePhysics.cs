@@ -43,10 +43,9 @@ public class VehiclePhysics : MonoBehaviour
         veh = GetComponent<VehicleStatic>();
         wng = new(new Vector3(-2.5f, 0.0f), veh.Length / 2f, 0.5f * veh.Width, 3f, 0f);
         rb = GetComponent<Rigidbody2D>();
-        ful = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
 
         // ! Set up dynamic params
-        rb.inertia = 1f / 12f * rb.mass * (veh.Length * veh.Length + veh.Height * veh.Height);
+        rb.inertia = 1f / 12f * rb.mass * (veh.Length * veh.Length + veh.Height * veh.Height); // Moment of inertia of rectangular prism
 
         Velocity = new Vector3(Speed, 0f, 0f);
         rb.velocity = rb.GetRelativeVector(Velocity);
@@ -112,6 +111,7 @@ public class VehiclePhysics : MonoBehaviour
         // -- Flow Streams --
         foreach (Processor[] line in veh.FlowLines)
         {
+            Debug.Log("New Flow Line");
             for (int c = 0; c < line.Length; c++)
             {
                 if (line[c].operated)
@@ -130,7 +130,18 @@ public class VehiclePhysics : MonoBehaviour
                     }
                     Force += line[c].Force;
                     Moment += line[c].Moment;
+                    //Debug.Log(c + ": " + line[c].Current[^1].Fluid.P);
+                    Debug.Log(c + ": " + line[c].Force);
                 }
+            }
+        }
+
+        // Reset Operation
+        foreach (Processor[] line in veh.FlowLines)
+        {
+            for (int c = 0; c < line.Length; c++)
+            {
+                line[c].operated = false;
             }
         }
 
@@ -152,12 +163,6 @@ public class VehiclePhysics : MonoBehaviour
         rb.AddTorque(Moment);
 
         //rb.rotation = fcs.PitchInceptor;
-
-        //Debug.Log("Inlet: " + afm.InletRamp.Fluid.P);
-        //Debug.Log("Engine: " + afm.Engine.Fluid.P);
-        //Debug.Log("Nozzle: " + afm.Nozzle.Fluid.P);
-        //Debug.Log("Nacelle: " + afm.NacelleRamp.Fluid.P);
-        //Debug.Log("Upper: " + afm.UpperRamp.Fluid.P);
     }
 
 }

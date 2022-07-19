@@ -21,6 +21,11 @@ public class DoubleEngine : VehicleStatic
     Mesh upperNacelle;
     Mesh lowerNacelle;
 
+    // Local Centroids
+    Vector3 fuselageCentroid;
+    Vector3 upperNacelleCentroid;
+    Vector3 lowerNacelleCentroid;
+
 
     public override void BuildFlowLines()
     {
@@ -35,39 +40,139 @@ public class DoubleEngine : VehicleStatic
         FlowLines = new Processor[][] { upperFlowLine, upperEngineFlowLine, lowerFlowLine, lowerEngineFlowLine };
     }
 
+    public override void BuildPerimeter()
+    {
+        List<GameObject[]> perimeter = new List<GameObject[]>();
+
+        GameObject[] fuselagePoints = new GameObject[LowerRampPoints.Length + UpperRampPoints.Length + 2]; // +2 for upperengine +2 for lowerengine -2 for upper points overlap
+        GameObject[] upperNacellePoints = new GameObject[UpperNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
+        GameObject[] lowerNacellePoints = new GameObject[LowerNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
+
+        // Select perimeter points from hardcoded groupings in a clockwise manner
+        // Fuselage
+        for (int pt = 0; pt < LowerRampPoints.Length; pt++)
+        {
+            fuselagePoints[pt] = LowerRampPoints[pt];
+        }
+
+        fuselagePoints[LowerRampPoints.Length] = LowerEnginePoints[2];
+        fuselagePoints[LowerRampPoints.Length + 1] = LowerNozzlePoints[2];
+        fuselagePoints[LowerRampPoints.Length + 2] = UpperEnginePoints[2];
+
+        for (int pt = LowerRampPoints.Length + 3; pt < fuselagePoints.Length - 1; pt++) // follow on from engine point[2]
+        {
+            fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Length - 1 - (pt - (LowerRampPoints.Length + 3))];
+        }
+
+
+        // Upper Nacelle
+        upperNacellePoints[0] = UpperEnginePoints[1];
+        upperNacellePoints[1] = UpperEnginePoints[3];
+
+        for (int pt = 2; pt < upperNacellePoints.Length - 1; pt++) // follow on from engine point[3]
+        {
+            upperNacellePoints[pt] = UpperNacelleRampPoints[UpperRampPoints.Length - 1 - (pt - (LowerRampPoints.Length + 1))];
+        }
+
+
+        // Lower Nacelle
+        for (int pt = 0; pt < LowerNacelleRampPoints.Length - 1; pt++)
+        {
+            lowerNacellePoints[pt] = LowerNacelleRampPoints[pt];
+        }
+
+        lowerNacellePoints[LowerNacelleRampPoints.Length - 1] = LowerEnginePoints[3];
+
+
+        perimeter.Add(fuselagePoints);
+        perimeter.Add(upperNacellePoints);
+        perimeter.Add(lowerNacellePoints);
+
+        OrderedPerimeter = perimeter;
+
+        IsCentred = false; // Point lists end with return to start
+    }
+
     public override void CentrePoints()
     {
-        // Fuselage
-        Vector3 upperFuselageCentroid = TriangleCentroid(UpperRampPoints[0].transform.localPosition, UpperNozzlePoints[2].transform.localPosition, UpperEnginePoints[2].transform.localPosition);
-        float upperFuselageArea = TriangleArea(UpperRampPoints[0].transform.localPosition, UpperNozzlePoints[2].transform.localPosition, UpperEnginePoints[2].transform.localPosition);
-
-        Vector3 lowerFuselageCentroid = TriangleCentroid(LowerRampPoints[0].transform.localPosition, LowerNozzlePoints[2].transform.localPosition, LowerEnginePoints[2].transform.localPosition);
-        float lowerFuselageArea = TriangleArea(LowerRampPoints[0].transform.localPosition, LowerNozzlePoints[2].transform.localPosition, LowerEnginePoints[2].transform.localPosition);
-
-        float fuselageArea = upperFuselageArea + lowerFuselageArea;
-        Vector3 fuselageCentroid = (upperFuselageCentroid * upperFuselageArea + lowerFuselageCentroid * lowerFuselageArea) / fuselageArea;
+        if (!IsCentred)
+        {
+            // Fuselage
+            float fuselageArea = PolyArea(OrderedPerimeter[0]);
+            fuselageCentroid = PolyCentroid(OrderedPerimeter[0]);
 
 
-        // Nacelle
-        Vector3 upperNacelleCentroid = TriangleCentroid(UpperNacelleRampPoints[0].transform.localPosition, UpperNacelleRampPoints[^1].transform.localPosition, UpperEnginePoints[3].transform.localPosition);
-        float upperNacelleArea = TriangleArea(UpperNacelleRampPoints[0].transform.localPosition, UpperNacelleRampPoints[^1].transform.localPosition, UpperEnginePoints[3].transform.localPosition);
+            // Nacelle
+            float upperNacelleArea = PolyArea(OrderedPerimeter[1]);
+            upperNacelleCentroid = PolyCentroid(OrderedPerimeter[1]);
 
-        Vector3 lowerNacelleCentroid = TriangleCentroid(LowerNacelleRampPoints[0].transform.localPosition, LowerNacelleRampPoints[^1].transform.localPosition, LowerEnginePoints[3].transform.localPosition);
-        float lowerNacelleArea = TriangleArea(LowerNacelleRampPoints[0].transform.localPosition, LowerNacelleRampPoints[^1].transform.localPosition, LowerEnginePoints[3].transform.localPosition);
+            float lowerNacelleArea = PolyArea(OrderedPerimeter[2]);
+            lowerNacelleCentroid = PolyCentroid(OrderedPerimeter[2]);
 
-        float nacelleArea = upperNacelleArea + lowerNacelleArea;
-        Vector3 nacelleCentroid = (upperNacelleCentroid * upperNacelleArea + lowerNacelleCentroid * lowerNacelleArea) / nacelleArea;
+            float nacelleArea = upperNacelleArea + lowerNacelleArea;
+            Vector3 nacelleCentroid = (upperNacelleCentroid * upperNacelleArea + lowerNacelleCentroid * lowerNacelleArea) / nacelleArea;
 
 
-        // Combined
-        Centroid = (fuselageCentroid * fuselageArea + nacelleCentroid * nacelleArea) / (fuselageArea + nacelleArea);
+            // Combined
+            Centroid = (fuselageCentroid * fuselageArea + nacelleCentroid * nacelleArea) / (fuselageArea + nacelleArea);
+
+
+            // -- Shift Points --
+            foreach (GameObject[] pts in OrderedPerimeter)
+            {
+                foreach (GameObject pt in pts)
+                {
+                    pt.transform.localPosition -= Centroid;
+                }
+            }
+            fuselageCentroid -= Centroid;
+            upperNacelleCentroid -= Centroid;
+            lowerNacelleCentroid -= Centroid;
+
+            IsCentred = true; // Point lists end with centroid
+        }
     }
 
     public override void BuildMeshes()
     {
-        Vector3[] fuselageVertices = new Vector3[LowerRampPoints.Length + UpperRampPoints.Length + 2]; // +2 for upperengine +2 for lowerengine -2 for upper points overlap
-        Vector3[] upperNacelleVertices = new Vector3[UpperNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
-        Vector3[] lowerNacelleVertices = new Vector3[LowerNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
+        fuselage = new Mesh();
+        upperNacelle = new Mesh();
+        lowerNacelle = new Mesh();
+
+        Vector3[] fuselageVertices = new Vector3[OrderedPerimeter[0].Length + 1];
+        Vector3[] upperNacelleVertices = new Vector3[OrderedPerimeter[1].Length + 1];
+        Vector3[] lowerNacelleVertices = new Vector3[OrderedPerimeter[2].Length + 1];
+
+        for (int f = 0; f < fuselageVertices.Length - 1; f++)
+        {
+            fuselageVertices[f] = OrderedPerimeter[0][f].transform.localPosition;
+        }
+        fuselageVertices[^1] = fuselageCentroid;
+
+        for (int n = 0; n < upperNacelleVertices.Length - 1; n++)
+        {
+            upperNacelleVertices[n] = OrderedPerimeter[1][n].transform.localPosition;
+        }
+        upperNacelleVertices[^1] = upperNacelleCentroid;
+
+        for (int n = 0; n < lowerNacelleVertices.Length - 1; n++)
+        {
+            lowerNacelleVertices[n] = OrderedPerimeter[2][n].transform.localPosition;
+        }
+        lowerNacelleVertices[^1] = lowerNacelleCentroid;
+
+
+        fuselage.vertices = fuselageVertices;
+        fuselage.vertices[^1] = Vector3.zero;
+        fuselage.triangles = TrianglesAboutCentroid(fuselage.vertices);
+
+        upperNacelle.vertices = upperNacelleVertices;
+        upperNacelle.vertices[^1] = Vector3.zero;
+        upperNacelle.triangles = TrianglesAboutCentroid(upperNacelle.vertices);
+
+        lowerNacelle.vertices = lowerNacelleVertices;
+        lowerNacelle.vertices[^1] = Vector3.zero;
+        lowerNacelle.triangles = TrianglesAboutCentroid(lowerNacelle.vertices);
     }
 
     public override Mesh[] GetMeshes()

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public abstract class VehicleStatic : MonoBehaviour
 {
     // Stores all of the static variables that are operated on elsewhere
@@ -12,9 +13,9 @@ public abstract class VehicleStatic : MonoBehaviour
     public bool IsCentred = false;
 
     public float Length;
-    public float Width;
+    public float Width = 1f;
     public float Height;
-    public Fuel fuel;
+    public Fuel fuel = new(290.3f, 1.238f, 0.0291f, 119.95e6f);
     public Vector3 Centroid;
     public Processor[][] FlowLines;
     public List<GameObject[]> OrderedPerimeter;
@@ -25,43 +26,27 @@ public abstract class VehicleStatic : MonoBehaviour
     public abstract void BuildMeshes();
     public abstract Mesh[] GetMeshes();
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        BuildVehicle();
     }
 
     public void BuildVehicle()
     {
         BuildPerimeter();
         CentrePoints();
+        CalcDimensions();
         BuildFlowLines();
         BuildMeshes();
-    }
-
-    public float TriangleArea(Vector3 p0, Vector3 p1, Vector3 p2)
-    {
-        return 0.5f * Mathf.Abs(p0.x * (p1.y - p2.y) + p1.x * (p2.y - p1.y) + p2.x * (p0.y - p1.y));
-    }
-
-    public Vector3 TriangleCentroid(Vector3 p0, Vector3 p1, Vector3 p2)
-    {
-        return new Vector3((p0.x + p1.x + p2.x) / 3f, (p0.y + p1.y + p2.y) / 3f);
     }
 
     public float PolyArea(GameObject[] pts)
     {
         float area = 0f;
-        for (int i = 0; i < pts.Length - 1; i++)
+        for (int i = 0; i < pts.Length; i++)
         {
             Vector3 current = pts[i].transform.localPosition;
-            Vector3 next = pts[i + 1].transform.localPosition;
+            Vector3 next = i < pts.Length - 1 ? pts[i + 1].transform.localPosition : pts[0].transform.localPosition; // return to start if last index
             area += current.x * next.y - next.x * current.y;
         }
         area *= 0.5f;
@@ -73,10 +58,10 @@ public abstract class VehicleStatic : MonoBehaviour
         float area = 0f;
         float Cx = 0f;
         float Cy = 0f;
-        for (int i = 0; i < pts.Length - 1; i++)
+        for (int i = 0; i < pts.Length; i++)
         {
             Vector3 current = pts[i].transform.localPosition;
-            Vector3 next = pts[i + 1].transform.localPosition;
+            Vector3 next = i < pts.Length - 1 ? pts[i + 1].transform.localPosition : pts[0].transform.localPosition; // return to start if last index
             area += current.x * next.y - next.x * current.y;
             Cx += (current.x + next.x) * (current.x * next.y - next.x * current.y);
             Cy += (current.y + next.y) * (current.x * next.y - next.x * current.y);
@@ -85,6 +70,27 @@ public abstract class VehicleStatic : MonoBehaviour
         Cx /= 6f * area;
         Cy /= 6f * area;
         return new Vector3(Cx, Cy);
+    }
+
+    public void CalcDimensions()
+    {
+        Vector3 vmax = Vector3.negativeInfinity;
+        Vector3 vmin = Vector3.positiveInfinity;
+
+        foreach (GameObject[] pts in OrderedPerimeter)
+        {
+            foreach (GameObject pt in pts)
+            {
+                vmax.x = pt.transform.localPosition.x > vmax.x ? pt.transform.localPosition.x : vmax.x;
+                vmax.y = pt.transform.localPosition.y > vmax.y ? pt.transform.localPosition.y : vmax.y;
+                vmin.x = pt.transform.localPosition.x < vmin.x ? pt.transform.localPosition.x : vmin.x;
+                vmin.y = pt.transform.localPosition.y < vmin.y ? pt.transform.localPosition.y : vmin.y;
+            }
+        }
+
+        Vector3 delta = vmax - vmin;
+        Length = Mathf.Abs(delta.x);
+        Height = Mathf.Abs(delta.y);
     }
 
     public int[] TrianglesAboutCentroid(Vector3[] vertices)
