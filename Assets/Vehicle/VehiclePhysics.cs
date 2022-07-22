@@ -94,7 +94,7 @@ public class VehiclePhysics : MonoBehaviour
 
         Dmesh = new();
         Emesh = new();
-
+        
         // -- RESET DYNAMICS --
         Force = Vector3.zero;
         Moment = 0f;
@@ -108,10 +108,13 @@ public class VehiclePhysics : MonoBehaviour
         //Debug.Log("Velocity " + rb.velocity);
         //Debug.Log("Inlet Deflect Angle " + freeStream.AngleTo(afm.InletRamp));
 
+
         // -- Flow Streams --
+        veh.BuildFlowLines(); // reset flow lines
+
         foreach (Processor[] line in veh.FlowLines)
         {
-            Debug.Log("New Flow Line");
+            //Debug.Log("New Flow Line");
             for (int c = 0; c < line.Length; c++)
             {
                 if (line[c].operated)
@@ -131,17 +134,8 @@ public class VehiclePhysics : MonoBehaviour
                     Force += line[c].Force;
                     Moment += line[c].Moment;
                     //Debug.Log(c + ": " + line[c].Current[^1].Fluid.P);
-                    Debug.Log(c + ": " + line[c].Force);
+                    //Debug.Log(c + ": " + line[c].Force);
                 }
-            }
-        }
-
-        // Reset Operation
-        foreach (Processor[] line in veh.FlowLines)
-        {
-            for (int c = 0; c < line.Length; c++)
-            {
-                line[c].operated = false;
             }
         }
 
@@ -157,8 +151,8 @@ public class VehiclePhysics : MonoBehaviour
 
 
         // -- Forces --
-        Debug.Log("Force: " + Force);
-        Debug.Log("Moment: " + Moment);
+        //Debug.Log("Force: " + Force);
+        //Debug.Log("Moment: " + Moment);
         rb.AddRelativeForce(Force);
         rb.AddTorque(Moment);
 

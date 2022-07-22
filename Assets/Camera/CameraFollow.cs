@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public GameObject FollowTarget;
+    GameObject FollowTarget;
     [Range(-1f, 1f)]
     public float Xoffset;
     [Range(-1f, 1f)]
@@ -14,7 +14,7 @@ public class CameraFollow : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        FollowTarget = VehiclePhysics.Instance.gameObject;
     }
 
     // Update is called once per frame

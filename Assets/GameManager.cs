@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        SetGameState(GameState.Flying);
+        SetGameState(GameState.Building);
     }
 
     public void SetGameState(GameState newState)

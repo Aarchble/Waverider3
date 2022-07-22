@@ -47,7 +47,7 @@ public class UpperEngine : VehicleStatic
 
         fuselagePoints[LowerRampPoints.Length] = UpperEnginePoints[2];
 
-        for (int pt = LowerRampPoints.Length + 1; pt < fuselagePoints.Length - 1; pt++) // follow on from engine point[2]
+        for (int pt = LowerRampPoints.Length + 1; pt < fuselagePoints.Length; pt++) // follow on from engine point[2]
         {
             fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Length - 1 - (pt - (LowerRampPoints.Length + 1))];
         }
@@ -57,9 +57,9 @@ public class UpperEngine : VehicleStatic
         nacellePoints[0] = UpperEnginePoints[1];
         nacellePoints[1] = UpperEnginePoints[3];
 
-        for (int pt = 2; pt < nacellePoints.Length - 1; pt++) // follow on from engine point[3]
+        for (int pt = 2; pt < nacellePoints.Length; pt++) // follow on from engine point[3]
         {
-            nacellePoints[pt] = UpperNacelleRampPoints[UpperRampPoints.Length - 1 - (pt - (LowerRampPoints.Length + 1))];
+            nacellePoints[pt] = UpperNacelleRampPoints[UpperRampPoints.Length - 1 - (pt - 2)];
         }
 
 

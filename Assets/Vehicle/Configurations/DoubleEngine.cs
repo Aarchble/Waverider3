@@ -59,7 +59,7 @@ public class DoubleEngine : VehicleStatic
         fuselagePoints[LowerRampPoints.Length + 1] = LowerNozzlePoints[2];
         fuselagePoints[LowerRampPoints.Length + 2] = UpperEnginePoints[2];
 
-        for (int pt = LowerRampPoints.Length + 3; pt < fuselagePoints.Length - 1; pt++) // follow on from engine point[2]
+        for (int pt = LowerRampPoints.Length + 3; pt < fuselagePoints.Length; pt++) // follow on from engine point[2]
         {
             fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Length - 1 - (pt - (LowerRampPoints.Length + 3))];
         }
@@ -69,19 +69,19 @@ public class DoubleEngine : VehicleStatic
         upperNacellePoints[0] = UpperEnginePoints[1];
         upperNacellePoints[1] = UpperEnginePoints[3];
 
-        for (int pt = 2; pt < upperNacellePoints.Length - 1; pt++) // follow on from engine point[3]
+        for (int pt = 2; pt < upperNacellePoints.Length; pt++) // follow on from engine point[3]
         {
-            upperNacellePoints[pt] = UpperNacelleRampPoints[UpperRampPoints.Length - 1 - (pt - (LowerRampPoints.Length + 1))];
+            upperNacellePoints[pt] = UpperNacelleRampPoints[UpperRampPoints.Length - 1 - (pt - 2)];
         }
 
 
         // Lower Nacelle
-        for (int pt = 0; pt < LowerNacelleRampPoints.Length - 1; pt++)
+        for (int pt = 0; pt < LowerNacelleRampPoints.Length; pt++)
         {
             lowerNacellePoints[pt] = LowerNacelleRampPoints[pt];
         }
 
-        lowerNacellePoints[LowerNacelleRampPoints.Length - 1] = LowerEnginePoints[3];
+        lowerNacellePoints[LowerNacelleRampPoints.Length] = LowerEnginePoints[3];
 
 
         perimeter.Add(fuselagePoints);
