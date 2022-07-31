@@ -68,12 +68,11 @@ public class Deflect : Process
         float thickness = 0.01f;
 
         // NO MASK
-        if (InternalFlow)
+        if (InternalFlow) // -- Internal --
         {
-            // -- Internal --
             if (Theta > Tol)
             {
-                // Shock
+                // Same wall deflect
                 Vector3 wave = nearStream.FlowDir + nearStream.WallNormals()[0] * nearStream.FlowDir.magnitude * Mathf.Tan(Angles[0]);
                 featureVertices = new Vector3[] { nearStream.Inlet[0], nearStream.Inlet[0] + wave * length };
                 ThickLine waveLine = new(featureVertices[0], featureVertices[1], thickness);
@@ -82,9 +81,9 @@ public class Deflect : Process
             }
             else if (Theta < -Tol)
             {
-                // Shock
-                Vector3 wave = nearStream.FlowDir + nearStream.WallNormals()[0] * nearStream.FlowDir.magnitude * Mathf.Tan(Angles[0]);
-                featureVertices = new Vector3[] { nearStream.Inlet[^1], nearStream.Inlet[^1] + wave * length };
+                // Other wall deflect (nacelle)
+                Vector3 wave = nearStream.FlowDir + nearStream.WallNormals()[1] * nearStream.FlowDir.magnitude * Mathf.Tan(Angles[0]);
+                featureVertices = new Vector3[] { nearStream.Inlet[1], nearStream.Inlet[1] + wave * length };
                 ThickLine waveLine = new(featureVertices[0], featureVertices[1], thickness);
 
                 return new Mesh[] { waveLine.GetMesh() };
@@ -94,9 +93,8 @@ public class Deflect : Process
                 return null;
             }
         }
-        else
+        else // -- External --
         {
-            // -- External --
             if (Theta > Tol)
             {
                 // Shock

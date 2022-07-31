@@ -13,11 +13,14 @@ public class VehiclePhysics : MonoBehaviour
     VehicleStatic veh;
     Wing wng;
     Rigidbody2D rb;
-    Fuel ful;
 
     Vector3 Force;
     float Moment;
     Vector3 Velocity;
+    bool ActivePause;
+
+    Vector3 PausedVelocity;
+    float PausedRotation;
 
     public List<Mesh> Dmesh;
     public List<Mesh> Emesh;
@@ -47,8 +50,11 @@ public class VehiclePhysics : MonoBehaviour
         // ! Set up dynamic params
         rb.inertia = 1f / 12f * rb.mass * (veh.Length * veh.Length + veh.Height * veh.Height); // Moment of inertia of rectangular prism
 
-        Velocity = new Vector3(Speed, 0f, 0f);
-        rb.velocity = rb.GetRelativeVector(Velocity);
+        //Velocity = new Vector3(Speed, 0f, 0f);
+        //rb.velocity = rb.GetRelativeVector(Velocity);
+
+        ActivePause = true;
+        PausedVelocity = new Vector3(Speed, 0f, 0f);
 
         _debug = true;
     }
@@ -87,7 +93,7 @@ public class VehiclePhysics : MonoBehaviour
     void FixedUpdate()
     {
         Debug.Log("-- Fixed Update Start --");
-        Velocity = rb.GetVector(rb.velocity);
+        Velocity = ActivePause ? rb.GetVector(PausedVelocity) : rb.GetVector(rb.velocity);
 
         // Need to use the following equation to keep calculating velocity while paused
         //Vector3 velocity = new(Velocity * Mathf.Cos(-AoA * Mathf.Deg2Rad), Velocity * Mathf.Sin(-AoA * Mathf.Deg2Rad), 0f);
@@ -150,13 +156,39 @@ public class VehiclePhysics : MonoBehaviour
         //}
 
 
-        // -- Forces --
-        //Debug.Log("Force: " + Force);
-        //Debug.Log("Moment: " + Moment);
-        rb.AddRelativeForce(Force);
-        rb.AddTorque(Moment);
-
-        //rb.rotation = fcs.PitchInceptor;
+        if (!ActivePause)
+        {
+            // -- Forces --
+            //Debug.Log("Force: " + Force);
+            //Debug.Log("Moment: " + Moment);
+            rb.AddRelativeForce(Force);
+            rb.AddTorque(Moment);
+        }
     }
 
+    public void StartActivePause()
+    {
+        if (!ActivePause)
+        {
+            // Pause
+            ActivePause = true;
+            PausedVelocity = rb.velocity;
+            PausedRotation = rb.rotation;
+
+            rb.velocity = Vector3.zero;
+            rb.rotation = 0f;
+        }
+    }
+
+    public void StopActivePause()
+    {
+        if (ActivePause)
+        {
+            // Unpause
+            ActivePause = false;
+            rb.rotation = PausedRotation;
+            rb.velocity = PausedVelocity;
+
+        }
+    }
 }

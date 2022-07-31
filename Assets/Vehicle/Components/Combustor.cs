@@ -28,7 +28,7 @@ public class Combustor : Processor
         Parcel preEngine = Isolator.GetParcel(inStream.Fluid); // engine fluid pre-combustion
         // ! This pressure doesn't act anywhere significant
         AddDrawnMesh(DeflectMeshes, Isolator.GetDeflectMesh(Current[0])); // This will always be a shock, hence only adds one Mesh to list. 
-
+        Debug.Log(Mathf.Rad2Deg * Isolator.Theta);
 
         // Engine -> Nozzle => COMBUST
         float minCombustionLength = 0.0f; // not dimensionless

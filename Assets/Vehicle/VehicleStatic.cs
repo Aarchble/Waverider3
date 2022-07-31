@@ -10,6 +10,7 @@ public abstract class VehicleStatic : MonoBehaviour
     // - Dimensions
     // - Meshes
 
+    public static VehicleStatic Instance;
     public bool IsCentred = false;
 
     public float Length;
@@ -25,6 +26,11 @@ public abstract class VehicleStatic : MonoBehaviour
     public abstract void CentrePoints();
     public abstract void BuildMeshes();
     public abstract Mesh[] GetMeshes();
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {

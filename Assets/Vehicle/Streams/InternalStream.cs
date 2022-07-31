@@ -23,6 +23,14 @@ public class InternalStream : NearStream
 
     public override Vector3[] WallNormals(Stream matchStream = null)
     {
-        return new Vector3[2] { Vector3.Cross(Outlet[0] - Inlet[0], Vector3.back).normalized, Vector3.Cross(Outlet[1] - Inlet[1], Vector3.forward).normalized };
+        //return new Vector3[2] { Vector3.Cross(Outlet[0] - Inlet[0], Vector3.back).normalized, Vector3.Cross(Outlet[1] - Inlet[1], Vector3.forward).normalized };
+        if (Vector3.Dot(Vector3.Cross(Outlet[0] - Inlet[0], Vector3.back).normalized, Inlet[1] - Inlet[0]) > 0f) // probably lower
+        {
+            return new Vector3[2] { Vector3.Cross(Outlet[0] - Inlet[0], Vector3.back).normalized, Vector3.Cross(Outlet[1] - Inlet[1], Vector3.forward).normalized };
+        }
+        else // probably upper
+        {
+            return new Vector3[2] { Vector3.Cross(Outlet[0] - Inlet[0], Vector3.forward).normalized, Vector3.Cross(Outlet[1] - Inlet[1], Vector3.back).normalized };
+        }
     }
 }

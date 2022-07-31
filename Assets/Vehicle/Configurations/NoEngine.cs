@@ -35,9 +35,9 @@ public class NoEngine : VehicleStatic
             fuselagePoints[pt] = LowerRampPoints[pt];
         }
 
-        for (int pt = LowerRampPoints.Length; pt < fuselagePoints.Length - 1; pt++) // follow on from engine point[2]
+        for (int pt = LowerRampPoints.Length; pt < fuselagePoints.Length; pt++) // follow on from engine point[2]
         {
-            fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Length - 1 - (pt - LowerRampPoints.Length)];
+            fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Length - 2 - (pt - LowerRampPoints.Length)];
         }
 
 
