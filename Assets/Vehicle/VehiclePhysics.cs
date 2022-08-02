@@ -21,6 +21,7 @@ public class VehiclePhysics : MonoBehaviour
 
     Vector3 PausedVelocity;
     float PausedRotation;
+    float PausedAngularVelocity;
 
     public List<Mesh> Dmesh;
     public List<Mesh> Emesh;
@@ -173,9 +174,12 @@ public class VehiclePhysics : MonoBehaviour
             // Pause
             ActivePause = true;
             PausedVelocity = rb.velocity;
+            PausedAngularVelocity = rb.angularVelocity;
             PausedRotation = rb.rotation;
 
+            rb.gravityScale = 0f;
             rb.velocity = Vector3.zero;
+            rb.angularVelocity = 0f;
             rb.rotation = 0f;
         }
     }
@@ -187,7 +191,9 @@ public class VehiclePhysics : MonoBehaviour
             // Unpause
             ActivePause = false;
             rb.rotation = PausedRotation;
+            rb.angularVelocity = PausedAngularVelocity;
             rb.velocity = PausedVelocity;
+            rb.gravityScale = 1f;
 
         }
     }

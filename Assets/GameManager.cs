@@ -8,45 +8,73 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public GameObject Vehicle;
     public GameState State;
+    public PlayerInputActions playerControls;
+    InputAction switchBuildFly;
 
     float previousCameraSize;
 
     private void Awake()
     {
         Instance = this;
+        playerControls = new PlayerInputActions();
+    }
+
+    private void OnEnable()
+    {
+        switchBuildFly = playerControls.ManagementControls.SwitchBuildFly;
+        switchBuildFly.Enable();
+        switchBuildFly.performed += ToggleBuildFly;
+    }
+
+    private void OnDisable()
+    {
+        switchBuildFly.Disable();
     }
 
     private void Start()
     {
         previousCameraSize = Camera.main.orthographicSize;
-        SetGameState(GameState.Flying);
+        StartBuilding();
     }
 
-    public void SetGameState(GameState newState)
+    private void StartBuilding()
     {
-        switch (newState)
+        State = GameState.Building;
+
+        // Pause simulation
+        VehiclePhysics.Instance.StartActivePause();
+
+        // Zoom in to building mode
+        previousCameraSize = Camera.main.orthographicSize;
+        Camera.main.orthographicSize = VehicleStatic.Instance.Length * 1.1f * Screen.height / (2f * Screen.width);
+    }
+
+    private void StartFlying()
+    {
+        State = GameState.Flying;
+
+        // Zoom back out to flying mode
+        Camera.main.orthographicSize = previousCameraSize;
+
+        // Resume simulation
+        VehiclePhysics.Instance.StopActivePause();
+    }
+
+    private void ToggleBuildFly(InputAction.CallbackContext context)
+    {
+        switch (State)
         {
             case GameState.Building:
-                // Pause simulation
-                Time.timeScale = 0f;
-
-                // Zoom in to building mode
-                previousCameraSize = Camera.main.orthographicSize;
-                Camera.main.orthographicSize = VehicleStatic.Instance.Length * 1.1f * Screen.height / (2f * Screen.width);
-
+                StartFlying();
                 break;
             case GameState.Flying:
-                // Resume simulation
-                Time.timeScale = 1f;
-
-                // Zoom back out to flying mode
-                Camera.main.orthographicSize = previousCameraSize;
-
+                StartBuilding();
+                break;
+            default:
                 break;
         }
-
-        State = newState;
     }
+    
 }
 
 public enum GameState
