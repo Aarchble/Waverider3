@@ -93,7 +93,7 @@ public class VehiclePhysics : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        Debug.Log("-- Fixed Update Start --");
+        //Debug.Log("-- Fixed Update Start --");
         Velocity = ActivePause ? rb.GetVector(PausedVelocity) : rb.GetVector(rb.velocity);
 
         // Need to use the following equation to keep calculating velocity while paused
@@ -111,6 +111,7 @@ public class VehiclePhysics : MonoBehaviour
         Parcel Atmosphere = new(287f, 1.4f, 1013f, 220f);
         Atmosphere.SetVelocity(Mathf.Abs(Velocity.magnitude));
         freeStream.Fluid = Atmosphere;
+        Vector2 weight = rb.GetVector(9.81f * rb.mass * Vector2.down);
         //Debug.Log("Atmosphere " + freeStream.Fluid.M);
         //Debug.Log("Velocity " + rb.velocity);
         //Debug.Log("Inlet Deflect Angle " + freeStream.AngleTo(afm.InletRamp));
@@ -162,7 +163,7 @@ public class VehiclePhysics : MonoBehaviour
             // -- Forces --
             //Debug.Log("Force: " + Force);
             //Debug.Log("Moment: " + Moment);
-            rb.AddRelativeForce(Force);
+            rb.AddRelativeForce((Vector2)Force + weight);
             rb.AddTorque(Moment);
         }
     }
@@ -177,7 +178,6 @@ public class VehiclePhysics : MonoBehaviour
             PausedAngularVelocity = rb.angularVelocity;
             PausedRotation = rb.rotation;
 
-            rb.gravityScale = 0f;
             rb.velocity = Vector3.zero;
             rb.angularVelocity = 0f;
             rb.rotation = 0f;
@@ -193,8 +193,6 @@ public class VehiclePhysics : MonoBehaviour
             rb.rotation = PausedRotation;
             rb.angularVelocity = PausedAngularVelocity;
             rb.velocity = PausedVelocity;
-            rb.gravityScale = 1f;
-
         }
     }
 }

@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public GameObject Vehicle;
     public GameState State;
-    public PlayerInputActions playerControls;
+    public static PlayerInputActions playerControls;
     InputAction switchBuildFly;
 
     float previousCameraSize;
@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     private void OnDisable()
     {
+        switchBuildFly.performed -= ToggleBuildFly;
         switchBuildFly.Disable();
     }
 
@@ -46,7 +47,7 @@ public class GameManager : MonoBehaviour
 
         // Zoom in to building mode
         previousCameraSize = Camera.main.orthographicSize;
-        Camera.main.orthographicSize = VehicleStatic.Instance.Length * 1.1f * Screen.height / (2f * Screen.width);
+        Camera.main.orthographicSize = VehicleStatic.Instance.Length * 1.5f * Screen.height / (2f * Screen.width);
     }
 
     private void StartFlying()

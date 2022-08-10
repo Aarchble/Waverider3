@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6929983649343415250}
   - component: {fileID: 5601651957959156807}
   - component: {fileID: 1270206523733642424}
-  - component: {fileID: 6149258350126161234}
+  - component: {fileID: 8793724847299324513}
   m_Layer: 0
   m_Name: Point
   m_TagString: BuildPoint
@@ -47,9 +47,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0028694a213e12040a82c3b3212e8082, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UpstreamPoint: []
-  DownstreamPoint: []
-  PartnerPoint: {fileID: 0}
 --- !u!33 &5601651957959156807
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -100,19 +97,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!58 &6149258350126161234
-CircleCollider2D:
+--- !u!135 &8793724847299324513
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6929983649343415249}
-  m_Enabled: 1
-  m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}

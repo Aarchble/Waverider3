@@ -28,7 +28,6 @@ public class Combustor : Processor
         Parcel preEngine = Isolator.GetParcel(inStream.Fluid); // engine fluid pre-combustion
         // ! This pressure doesn't act anywhere significant
         AddDrawnMesh(DeflectMeshes, Isolator.GetDeflectMesh(Current[0])); // This will always be a shock, hence only adds one Mesh to list. 
-        Debug.Log(Mathf.Rad2Deg * Isolator.Theta);
 
         // Engine -> Nozzle => COMBUST
         float minCombustionLength = 0.0f; // not dimensionless
@@ -36,7 +35,7 @@ public class Combustor : Processor
         if (Vector3.Dot(Current[0].Outlet[0] - Isolator.featureVertices[0], Current[0].FlowDir) < minCombustionLength || Vector3.Dot(Current[0].Outlet[^1] - Isolator.featureVertices[1], Current[0].FlowDir) < minCombustionLength)
         {
             // ! Engine shock exits the combustion chamber through the nozzle, combustion unlikely
-            Debug.Log("Insufficient Combustion!");
+            //Debug.Log("Insufficient Combustion!");
             Current[0].Fluid = preEngine;
         }
         else

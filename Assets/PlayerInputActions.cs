@@ -56,24 +56,24 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
             ""id"": ""b813089c-be60-486a-abd3-cdda3ece5983"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
-                    ""type"": ""Button"",
+                    ""name"": ""DragAndMove"",
+                    ""type"": ""Value"",
                     ""id"": ""d8b1b20f-0b20-4d54-8854-23a838b98315"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
                 {
                     ""name"": """",
                     ""id"": ""698b1599-76fd-4c14-a601-ef4a7c6a3c9f"",
-                    ""path"": """",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
+                    ""action"": ""DragAndMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -115,7 +115,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         m_FlightControls_Newaction = m_FlightControls.FindAction("New action", throwIfNotFound: true);
         // BuildingControls
         m_BuildingControls = asset.FindActionMap("BuildingControls", throwIfNotFound: true);
-        m_BuildingControls_Newaction = m_BuildingControls.FindAction("New action", throwIfNotFound: true);
+        m_BuildingControls_DragAndMove = m_BuildingControls.FindAction("DragAndMove", throwIfNotFound: true);
         // ManagementControls
         m_ManagementControls = asset.FindActionMap("ManagementControls", throwIfNotFound: true);
         m_ManagementControls_SwitchBuildFly = m_ManagementControls.FindAction("SwitchBuildFly", throwIfNotFound: true);
@@ -211,12 +211,12 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     // BuildingControls
     private readonly InputActionMap m_BuildingControls;
     private IBuildingControlsActions m_BuildingControlsActionsCallbackInterface;
-    private readonly InputAction m_BuildingControls_Newaction;
+    private readonly InputAction m_BuildingControls_DragAndMove;
     public struct BuildingControlsActions
     {
         private @PlayerInputActions m_Wrapper;
         public BuildingControlsActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_BuildingControls_Newaction;
+        public InputAction @DragAndMove => m_Wrapper.m_BuildingControls_DragAndMove;
         public InputActionMap Get() { return m_Wrapper.m_BuildingControls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -226,16 +226,16 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         {
             if (m_Wrapper.m_BuildingControlsActionsCallbackInterface != null)
             {
-                @Newaction.started -= m_Wrapper.m_BuildingControlsActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_BuildingControlsActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_BuildingControlsActionsCallbackInterface.OnNewaction;
+                @DragAndMove.started -= m_Wrapper.m_BuildingControlsActionsCallbackInterface.OnDragAndMove;
+                @DragAndMove.performed -= m_Wrapper.m_BuildingControlsActionsCallbackInterface.OnDragAndMove;
+                @DragAndMove.canceled -= m_Wrapper.m_BuildingControlsActionsCallbackInterface.OnDragAndMove;
             }
             m_Wrapper.m_BuildingControlsActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
+                @DragAndMove.started += instance.OnDragAndMove;
+                @DragAndMove.performed += instance.OnDragAndMove;
+                @DragAndMove.canceled += instance.OnDragAndMove;
             }
         }
     }
@@ -279,7 +279,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     }
     public interface IBuildingControlsActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnDragAndMove(InputAction.CallbackContext context);
     }
     public interface IManagementControlsActions
     {

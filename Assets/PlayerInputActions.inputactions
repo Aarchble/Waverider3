@@ -34,24 +34,24 @@
             "id": "b813089c-be60-486a-abd3-cdda3ece5983",
             "actions": [
                 {
-                    "name": "New action",
-                    "type": "Button",
+                    "name": "DragAndMove",
+                    "type": "Value",
                     "id": "d8b1b20f-0b20-4d54-8854-23a838b98315",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
                 {
                     "name": "",
                     "id": "698b1599-76fd-4c14-a601-ef4a7c6a3c9f",
-                    "path": "",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "DragAndMove",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
