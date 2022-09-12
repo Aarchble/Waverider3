@@ -10,11 +10,11 @@ public class Ramp : Processor
     // Processes
     Deflect[] Surfaces;
 
-    public Ramp(GameObject[] points, bool upper, float width)
+    public Ramp(List<GameObject> points, bool upper, float width)
     {
-        ExternalStream[] streams = new ExternalStream[points.Length - 1];
+        ExternalStream[] streams = new ExternalStream[points.Count - 1];
 
-        for (int pt = 0; pt < points.Length - 1; pt++)
+        for (int pt = 0; pt < points.Count - 1; pt++)
         {
             streams[0] = new ExternalStream(points[pt].transform.localPosition, points[pt + 1].transform.localPosition, upper);
         }

@@ -539,6 +539,40 @@ MonoBehaviour:
       m_Action: Mouse Click
       m_Flags: 0
     m_Flags: 0
+  shiftMouseClick:
+    m_Name: Shift Mouse Click
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 4be5e887-93cc-4018-9683-b2b9c83c2c6c
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: One Modifier
+      m_Id: efdc35d8-a3ff-48a7-8e53-28c9eaf56400
+      m_Path: OneModifier
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Shift Mouse Click
+      m_Flags: 4
+    - m_Name: modifier
+      m_Id: c0019350-8d30-49d2-a637-52ac23a4f526
+      m_Path: <Keyboard>/shift
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Shift Mouse Click
+      m_Flags: 8
+    - m_Name: binding
+      m_Id: 6438ef6b-3235-4a0d-a9d6-c6d65d1238dc
+      m_Path: <Mouse>/leftButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Shift Mouse Click
+      m_Flags: 8
+    m_Flags: 0
+  BuildPoint: {fileID: 6929983649343415249, guid: 3ddb5edf6a5d4aa4faaceae90ffc3ed1, type: 3}
 --- !u!1001 &1804111688
 PrefabInstance:
   m_ObjectHideFlags: 0

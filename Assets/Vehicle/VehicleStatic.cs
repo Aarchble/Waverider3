@@ -26,6 +26,7 @@ public abstract class VehicleStatic : MonoBehaviour
     public abstract void CentrePoints();
     public abstract void BuildMeshes();
     public abstract Mesh[] GetMeshes();
+    public abstract void AddRampPoint(GameObject newPoint);
 
     private void Awake()
     {
@@ -118,5 +119,10 @@ public abstract class VehicleStatic : MonoBehaviour
             }
         }
         return triangles;
+    }
+
+    public float NewPointDistances(GameObject newPoint, GameObject p0, GameObject p1)
+    {
+        return (newPoint.transform.localPosition - p0.transform.localPosition).magnitude + (newPoint.transform.localPosition - p1.transform.localPosition).magnitude;
     }
 }

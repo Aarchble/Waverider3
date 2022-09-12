@@ -60,6 +60,7 @@ public class VehiclePhysics : MonoBehaviour
         _debug = true;
     }
 
+
     void Update()
     {
         // -- Vehicle --
@@ -90,7 +91,7 @@ public class VehiclePhysics : MonoBehaviour
 
     }
 
-    // Update is called once per frame
+
     void FixedUpdate()
     {
         //Debug.Log("-- Fixed Update Start --");

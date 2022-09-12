@@ -9,6 +9,9 @@ public class BuildingManager : MonoBehaviour
     float SnapScale = 10f;
     [SerializeField]
     InputAction mouseClick;
+    [SerializeField]
+    InputAction shiftMouseClick;
+    public GameObject BuildPoint;
 
 
     private void Awake()
@@ -20,12 +23,18 @@ public class BuildingManager : MonoBehaviour
     {
         mouseClick.Enable();
         mouseClick.performed += MousePressed;
+
+        shiftMouseClick.Enable();
+        shiftMouseClick.performed += ShiftMousePressed;
     }
 
     private void OnDisable()
     {
         mouseClick.performed -= MousePressed;
-        mouseClick.Enable();
+        mouseClick.Disable();
+
+        shiftMouseClick.performed -= ShiftMousePressed;
+        shiftMouseClick.Disable();
     }
 
     private void MousePressed(InputAction.CallbackContext context)
@@ -33,17 +42,30 @@ public class BuildingManager : MonoBehaviour
         Debug.Log("Clicked");
         Ray ray = mainCam.ScreenPointToRay(Mouse.current.position.ReadValue());
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit)) // Clicked something
         {
             Debug.Log("Hit");
             if (hit.collider != null && hit.transform.tag == "BuildPoint")
             {
-                StartCoroutine(MouseDragUpdate(hit.collider.gameObject));
+                StartCoroutine(MovePointUpdate(hit.collider.gameObject));
             }
         }
     }
 
-    private IEnumerator MouseDragUpdate(GameObject clickedObject)
+    private void ShiftMousePressed(InputAction.CallbackContext context)
+    {
+        Debug.Log("Clicked");
+        Vector3 newPointPosition = mainCam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        newPointPosition.z = 0f;
+        Debug.Log("Add at " + Mouse.current.position.ReadValue());
+        // Instantiate new point at position
+        GameObject newPoint = Instantiate(BuildPoint, newPointPosition, transform.rotation, VehicleStatic.Instance.gameObject.transform);
+
+        // Add ramp point to vehicle
+        VehicleStatic.Instance.AddRampPoint(newPoint);
+    }
+
+    private IEnumerator MovePointUpdate(GameObject clickedObject)
     {
         float rayLength = Vector3.Distance(clickedObject.transform.position, mainCam.transform.position);
         while (mouseClick.ReadValue<float>() != 0f)

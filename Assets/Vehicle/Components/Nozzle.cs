@@ -9,7 +9,7 @@ public class Nozzle : Processor
     Exhaust UpperExhaust;
     Exhaust LowerExhaust;
 
-    public Nozzle(GameObject[] points, Stream outUpper, Stream outLower, float width)
+    public Nozzle(List<GameObject> points, Stream outUpper, Stream outLower, float width)
     {
         InternalStream stream = new(new Vector3[] { points[0].transform.localPosition, points[1].transform.localPosition }, new Vector3[] { points[2].transform.localPosition, points[3].transform.localPosition });
 

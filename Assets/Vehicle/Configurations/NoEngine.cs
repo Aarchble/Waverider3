@@ -5,10 +5,10 @@ using UnityEngine;
 public class NoEngine : VehicleStatic
 {
     // Upper Points
-    public GameObject[] UpperRampPoints;
+    public List<GameObject> UpperRampPoints;
 
     // Lower Points
-    public GameObject[] LowerRampPoints;
+    public List<GameObject> LowerRampPoints;
 
     //Meshes
     Mesh fuselage;
@@ -26,18 +26,18 @@ public class NoEngine : VehicleStatic
     {
         List<GameObject[]> perimeter = new List<GameObject[]>();
 
-        GameObject[] fuselagePoints = new GameObject[LowerRampPoints.Length + UpperRampPoints.Length - 2]; // -2 for upper points overlap
+        GameObject[] fuselagePoints = new GameObject[LowerRampPoints.Count + UpperRampPoints.Count - 2]; // -2 for upper points overlap
 
         // Select perimeter points from hardcoded groupings in a clockwise manner
         // Fuselage
-        for (int pt = 0; pt < LowerRampPoints.Length; pt++)
+        for (int pt = 0; pt < LowerRampPoints.Count; pt++)
         {
             fuselagePoints[pt] = LowerRampPoints[pt];
         }
 
-        for (int pt = LowerRampPoints.Length; pt < fuselagePoints.Length; pt++) // follow on from engine point[2]
+        for (int pt = LowerRampPoints.Count; pt < fuselagePoints.Length; pt++) // follow on from engine point[2]
         {
-            fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Length - 2 - (pt - LowerRampPoints.Length)];
+            fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Count - 2 - (pt - LowerRampPoints.Count)];
         }
 
 
@@ -84,6 +84,25 @@ public class NoEngine : VehicleStatic
         fuselage.vertices = fuselageVertices;
         fuselage.vertices[^1] = Vector3.zero;
         fuselage.triangles = TrianglesAboutCentroid(fuselage.vertices);
+    }
+
+    public override void AddRampPoint(GameObject newPoint)
+    {
+        List<List<GameObject>> ramps = new List<List<GameObject>> { UpperRampPoints, LowerRampPoints };
+        // Compare newPoint-ramp[0] and newPoint-ramp[^1] for each ramp
+        foreach (List<GameObject> ramp in ramps)
+        {
+
+        }
+
+        // Add newPoint to ramp with lowest combined distance -> chosenRamp
+
+
+        // Compare newPoint-chosenRamp[i]
+
+
+        // Place newPoint between lowest and second lowest distance
+
     }
 
     public override Mesh[] GetMeshes()

@@ -5,13 +5,13 @@ using UnityEngine;
 public class UpperEngine : VehicleStatic
 {
     // Upper Points
-    public GameObject[] UpperRampPoints;
-    public GameObject[] UpperEnginePoints;
-    public GameObject[] UpperNozzlePoints;
-    public GameObject[] UpperNacelleRampPoints;
+    public List<GameObject> UpperRampPoints;
+    public List<GameObject> UpperEnginePoints;
+    public List<GameObject> UpperNozzlePoints;
+    public List<GameObject> UpperNacelleRampPoints;
 
     // Lower Points
-    public GameObject[] LowerRampPoints;
+    public List<GameObject> LowerRampPoints;
 
     // Meshes
     Mesh fuselage;
@@ -35,21 +35,21 @@ public class UpperEngine : VehicleStatic
     {
         List<GameObject[]> perimeter = new List<GameObject[]>();
 
-        GameObject[] fuselagePoints = new GameObject[LowerRampPoints.Length + UpperRampPoints.Length]; // +2 for engine -2 for upper points overlap
-        GameObject[] nacellePoints = new GameObject[UpperNacelleRampPoints.Length + 1]; // +1 for engine/nozzle point
+        GameObject[] fuselagePoints = new GameObject[LowerRampPoints.Count + UpperRampPoints.Count]; // +2 for engine -2 for upper points overlap
+        GameObject[] nacellePoints = new GameObject[UpperNacelleRampPoints.Count + 1]; // +1 for engine/nozzle point
 
         // Select perimeter points from hardcoded groupings in a clockwise manner
         // Fuselage
-        for (int pt = 0; pt < LowerRampPoints.Length; pt++)
+        for (int pt = 0; pt < LowerRampPoints.Count; pt++)
         {
             fuselagePoints[pt] = LowerRampPoints[pt];
         }
 
-        fuselagePoints[LowerRampPoints.Length] = UpperEnginePoints[2];
+        fuselagePoints[LowerRampPoints.Count] = UpperEnginePoints[2];
 
-        for (int pt = LowerRampPoints.Length + 1; pt < fuselagePoints.Length; pt++) // follow on from engine point[2]
+        for (int pt = LowerRampPoints.Count + 1; pt < fuselagePoints.Length; pt++) // follow on from engine point[2]
         {
-            fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Length - 1 - (pt - (LowerRampPoints.Length + 1))];
+            fuselagePoints[pt] = UpperRampPoints[UpperRampPoints.Count - 1 - (pt - (LowerRampPoints.Count + 1))];
         }
 
 
@@ -59,7 +59,7 @@ public class UpperEngine : VehicleStatic
 
         for (int pt = 2; pt < nacellePoints.Length; pt++) // follow on from engine point[3]
         {
-            nacellePoints[pt] = UpperNacelleRampPoints[UpperRampPoints.Length - 1 - (pt - 2)];
+            nacellePoints[pt] = UpperNacelleRampPoints[UpperRampPoints.Count - 1 - (pt - 2)];
         }
 
 
@@ -132,6 +132,25 @@ public class UpperEngine : VehicleStatic
         nacelle.vertices = nacelleVertices;
         nacelle.vertices[^1] = Vector3.zero;
         nacelle.triangles = TrianglesAboutCentroid(nacelleVertices);
+
+    }
+
+    public override void AddRampPoint(GameObject newPoint)
+    {
+        List<List<GameObject>> ramps = new List<List<GameObject>> { LowerRampPoints, UpperRampPoints, UpperNacelleRampPoints };
+        // Compare newPoint-ramp[0] and newPoint-ramp[^1] for each ramp
+        foreach (List<GameObject> ramp in ramps)
+        {
+
+        }
+
+        // Add newPoint to ramp with lowest combined distance -> chosenRamp
+
+
+        // Compare newPoint-chosenRamp[i]
+
+
+        // Place newPoint between lowest and second lowest distance
 
     }
 
