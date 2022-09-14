@@ -62,7 +62,9 @@ public class BuildingManager : MonoBehaviour
         GameObject newPoint = Instantiate(BuildPoint, newPointPosition, transform.rotation, VehicleStatic.Instance.gameObject.transform);
 
         // Add ramp point to vehicle
+        //VehiclePhysics.Instance.StartSimPause();
         VehicleStatic.Instance.AddRampPoint(newPoint);
+        //VehiclePhysics.Instance.StopSimPause();
     }
 
     private IEnumerator MovePointUpdate(GameObject clickedObject)

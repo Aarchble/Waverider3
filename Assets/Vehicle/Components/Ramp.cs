@@ -16,7 +16,7 @@ public class Ramp : Processor
 
         for (int pt = 0; pt < points.Count - 1; pt++)
         {
-            streams[0] = new ExternalStream(points[pt].transform.localPosition, points[pt + 1].transform.localPosition, upper);
+            streams[pt] = new ExternalStream(points[pt].transform.localPosition, points[pt + 1].transform.localPosition, upper);
         }
 
         operated = false;
@@ -29,6 +29,7 @@ public class Ramp : Processor
 
         for (int s = 1; s < streams.Length; s++)
         {
+            // Surfaces[0] is set in Operate() (since it interfaces with the inStream)
             Surfaces[s] = new(streams[s - 1], streams[s]);
         }
     }
