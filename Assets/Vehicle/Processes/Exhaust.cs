@@ -63,17 +63,14 @@ public class Exhaust : Expand
         float thickness = 0.01f;
 
         float invert = Upper ? 1f : -1f;
+        Vector3 invertOutletPoint = Upper ? nearStream.Outlet[0] : nearStream.Outlet[^1];
 
-        Vector3 outletOrigin = nearStream.Outlet[0] + (nearStream.Outlet[^1] - nearStream.Outlet[0]) * 0.5f;
         featureVertices = new Vector3[jetBoundary.Count];
         Mesh[] meshes = new Mesh[jetBoundary.Count - 1];
 
-        Vector3 exitPlaneDir = (nearStream.Outlet[0] - nearStream.Outlet[^1]).normalized;
-        Vector3 exitDir = Vector3.Cross(exitPlaneDir, Vector3.back).normalized;
-
         for (int vert = 0; vert < jetBoundary.Count; vert++)
         {
-            featureVertices[vert] = outletOrigin + jetBoundary[vert].x * NozzleRadius * exitDir + invert * jetBoundary[vert].y * NozzleRadius * exitPlaneDir;
+            featureVertices[vert] = invertOutletPoint + jetBoundary[vert].x * NozzleRadius * nearStream.FlowDir.normalized + invert * (jetBoundary[vert].y - jetBoundary[0].y) * NozzleRadius * Vector3.Cross(nearStream.FlowDir, Vector3.forward).normalized;
 
             if (vert > 0)
             {
