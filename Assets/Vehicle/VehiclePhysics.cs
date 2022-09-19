@@ -100,7 +100,7 @@ public class VehiclePhysics : MonoBehaviour
     {
         if (!SimPause)
         {
-            //Debug.Log("-- Fixed Update Start --");
+            Debug.Log("-- Fixed Update Start --");
             Velocity = ActivePause ? rb.GetVector(PausedVelocity) : rb.GetVector(rb.velocity);
 
             // Need to use the following equation to keep calculating velocity while paused
@@ -140,11 +140,11 @@ public class VehiclePhysics : MonoBehaviour
                     {
                         if (c < 1)
                         {
-                            line[c].Operate(freeStream);
+                            line[c].Operate(freeStream); // freestream facing processor
                         }
                         else
                         {
-                            line[c].Operate(line[c - 1].GetOutput(line[c]));
+                            line[c].Operate(line[c - 1].GetOutput(line[c])); // check c-1 is upstream of c == c is downstream of c-1
                         }
                         Force += line[c].Force;
                         Moment += line[c].Moment;

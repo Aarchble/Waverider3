@@ -101,7 +101,7 @@ public class Deflect : Process
                 Vector3 wave = nearStream.FlowDir + nearStream.WallNormals()[0] * nearStream.FlowDir.magnitude * Mathf.Tan(Angles[0]);
                 featureVertices = new Vector3[] { nearStream.Inlet[0], nearStream.Inlet[0] + wave * length };
                 ThickLine waveLine = new(featureVertices[0], featureVertices[1], thickness);
-
+                
                 return new Mesh[] { waveLine.GetMesh() };
             }
             else if (Theta < -Tol)

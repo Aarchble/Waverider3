@@ -10,13 +10,16 @@ public class Ramp : Processor
     // Processes
     Deflect[] Surfaces;
 
+    bool Upper;
+
     public Ramp(List<GameObject> points, bool upper, float width)
     {
+        Upper = upper;
         ExternalStream[] streams = new ExternalStream[points.Count - 1];
 
         for (int pt = 0; pt < points.Count - 1; pt++)
         {
-            streams[pt] = new ExternalStream(points[pt].transform.localPosition, points[pt + 1].transform.localPosition, upper);
+            streams[pt] = new ExternalStream(points[pt].transform.localPosition, points[pt + 1].transform.localPosition, Upper);
         }
 
         operated = false;
@@ -56,8 +59,8 @@ public class Ramp : Processor
 
         for (int i = 0; i < Current.Length; i++)
         {
-            // Down is ExternalStream:
-            if (Surfaces[i].GetAngles()[^1] > Current[i].AngleToPoint(Current[i].Inlet[0], down.Current[0].Inlet[0]))
+            Vector3 shockNormal = Vector3.Cross(Surfaces[i].featureVertices[^1] - Surfaces[i].featureVertices[0], Upper ? Vector3.back : Vector3.forward).normalized;
+            if (Vector3.Dot(down.Current[0].Inlet[0] - Current[i].Inlet[0], shockNormal) > 0f)
             {
                 // Included
                 outStream = Current[i];

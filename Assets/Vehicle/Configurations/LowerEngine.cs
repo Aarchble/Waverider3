@@ -166,8 +166,6 @@ public class LowerEngine : VehicleStatic
 
         // Place newPoint between lowest and second lowest distance
         ramps[mindex].Insert(mindexLocal, newPoint);
-
-        BuildVehicle();
     }
 
     public override Mesh[] GetMeshes() // This runs every frame

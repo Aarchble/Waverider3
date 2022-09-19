@@ -23,17 +23,21 @@ public class BuildingManager : MonoBehaviour
     {
         mouseClick.Enable();
         mouseClick.performed += MousePressed;
+        mouseClick.canceled += UpdateVehicle;
 
         shiftMouseClick.Enable();
         shiftMouseClick.performed += ShiftMousePressed;
+        shiftMouseClick.canceled += UpdateVehicle;
     }
 
     private void OnDisable()
     {
         mouseClick.performed -= MousePressed;
+        mouseClick.canceled -= UpdateVehicle;
         mouseClick.Disable();
 
         shiftMouseClick.performed -= ShiftMousePressed;
+        shiftMouseClick.canceled -= UpdateVehicle;
         shiftMouseClick.Disable();
     }
 
@@ -65,6 +69,11 @@ public class BuildingManager : MonoBehaviour
         //VehiclePhysics.Instance.StartSimPause();
         VehicleStatic.Instance.AddRampPoint(newPoint);
         //VehiclePhysics.Instance.StopSimPause();
+    }
+
+    private void UpdateVehicle(InputAction.CallbackContext context)
+    {
+        VehicleStatic.Instance.BuildVehicle();
     }
 
     private IEnumerator MovePointUpdate(GameObject clickedObject)
