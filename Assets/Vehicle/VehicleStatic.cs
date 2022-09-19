@@ -123,6 +123,6 @@ public abstract class VehicleStatic : MonoBehaviour
 
     public float NewPointDistances(GameObject newPoint, GameObject p0, GameObject p1)
     {
-        return (newPoint.transform.localPosition - p0.transform.localPosition).magnitude + (newPoint.transform.localPosition - p1.transform.localPosition).magnitude;
+        return ((newPoint.transform.localPosition - p0.transform.localPosition).magnitude + (newPoint.transform.localPosition - p1.transform.localPosition).magnitude) / (p1.transform.localPosition - p0.transform.localPosition).magnitude;
     }
 }

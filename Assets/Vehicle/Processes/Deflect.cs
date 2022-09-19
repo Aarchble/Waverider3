@@ -5,7 +5,6 @@ using UnityEngine;
 public class Deflect : Process
 {
     public float Theta;
-    public Process Chosen;
     float[] Angles;
     float Tol;
     bool InternalFlow;
@@ -32,7 +31,6 @@ public class Deflect : Process
             Shock s = new(Mathf.Abs(Theta));
             Parcel f = s.GetParcel(i);
             Angles = new float[1] { s.ShockAngle };
-            Chosen = s;
             return f;
         }
         else if (Theta < -Tol)
@@ -41,24 +39,11 @@ public class Deflect : Process
             Fan e = new(Mathf.Abs(Theta));
             Parcel f = e.GetParcel(i);
             Angles = e.FanAngles;
-            Chosen = e;
             return f;
         }
         else
         {
             return i;
-        }
-    }
-
-    public float[] GetAngles()
-    {
-        if (Chosen != null)
-        {
-            return Angles;
-        }
-        else
-        {
-            return new float[1] { 0f };
         }
     }
 

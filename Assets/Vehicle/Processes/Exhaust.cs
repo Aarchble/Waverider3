@@ -68,9 +68,12 @@ public class Exhaust : Expand
         featureVertices = new Vector3[jetBoundary.Count];
         Mesh[] meshes = new Mesh[jetBoundary.Count - 1];
 
+        Vector3 exitPlaneDir = (nearStream.Outlet[0] - nearStream.Outlet[^1]).normalized;
+        Vector3 exitDir = Vector3.Cross(exitPlaneDir, Vector3.back).normalized;
+
         for (int vert = 0; vert < jetBoundary.Count; vert++)
         {
-            featureVertices[vert] = outletOrigin + jetBoundary[vert].x * NozzleRadius * nearStream.FlowDir + invert * jetBoundary[vert].y * NozzleRadius * Vector3.Cross(nearStream.FlowDir, Vector3.forward);
+            featureVertices[vert] = outletOrigin + jetBoundary[vert].x * NozzleRadius * exitDir + invert * jetBoundary[vert].y * NozzleRadius * exitPlaneDir;
 
             if (vert > 0)
             {
